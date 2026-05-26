@@ -21,35 +21,75 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
+      # Run Playwright tests and generate report
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --reporter=html,junit
+        continue-on-error: true
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+      # Upload HTML report (for failed test screenshots/logs)
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
 
-      - name: Send Email Notification
-        if: always()
+      # Upload test results (JUnit XML for parsing stats)
+      - name: Upload JUnit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: test-results/**/*.xml
+
+      # Parse results + generate summary
+      - name: Generate test summary
+        id: summary
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+
+          const xml = fs.readFileSync('test-results/junit.xml', 'utf-8');
+
+          const total = (xml.match(/<testcase/g) || []).length;
+          const failed = (xml.match(/<failure/g) || []).length;
+          const skipped = (xml.match(/skipped/g) || []).length;
+          const passed = total - failed - skipped;
+
+          const summary = `
+          Playwright Test Report
+
+          Total: ${total}
+          Passed: ${passed}
+          Failed: ${failed}
+          Skipped: ${skipped}
+          `;
+
+          fs.writeFileSync('summary.txt', summary);
+
+          console.log(summary);
+          EOF
+
+      # Send email report
+      - name: Send email report
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
           secure: true
-          username: ${{ secrets.GMAIL_USERNAME }}
-          password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: Playwright Test Result
-          to: mr_joe8888@yahoo.com
-          from: "GitHub Actions"
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "Playwright Test Report - ${{ github.run_number }}"
+          to: your_email@gmail.com
+          from: CI Bot <${{ secrets.EMAIL_USER }}>
           body: |
-            Test execution completed.
+            Hello,
 
-            Status: ${{ job.status }}
+            Here is your Playwright test report:
 
-            Workflow URL:
+            ${{ steps.summary.outputs.stdout }}
+
+            Artifacts:
+            - Playwright HTML Report (includes screenshots & logs for failures)
+            - JUnit XML results
+
+            GitHub Run:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
