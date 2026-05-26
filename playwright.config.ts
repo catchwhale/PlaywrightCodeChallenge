@@ -12,4 +12,14 @@ export default defineConfig({
         video: 'retain-on-failure',
         baseURL: config.baseURL,
     },
+    reporter: [
+         ['html'],
+        ['junit', { outputFile: 'test-results/junit.xml' }]
+    ],
+
+    use: {
+        trace: 'on-first-retry',
+    },
+
+    outputDir: 'test-results/',
 })
