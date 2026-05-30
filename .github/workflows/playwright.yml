@@ -16,13 +16,13 @@ jobs:
       # =========================================================
       # 1. Checkout repository
       # =========================================================
-      - name: 1️⃣ Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       # =========================================================
       # 2. Setup Node.js
       # =========================================================
-      - name: 2️⃣ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -31,113 +31,104 @@ jobs:
       # =========================================================
       # 3. Install dependencies
       # =========================================================
-      - name: 3️⃣ Install Dependencies
+      - name: Install Dependencies
         run: npm ci
 
       # =========================================================
       # 4. Install Playwright browsers
       # =========================================================
-      - name: 4️⃣ Install Playwright Browsers
+      - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       # =========================================================
-      # 5. Prepare directories (prevents ENOENT errors)
+      # 5. Prepare directories
       # =========================================================
-      - name: 5️⃣ Prepare Directories
+      - name: Prepare Directories
         run: mkdir -p test-results playwright-report
 
       # =========================================================
-      # 6. Run Playwright tests (UI + API)
+      # 6. Run Playwright tests
       # =========================================================
-      - name: 6️⃣ Run Playwright Tests
+      - name: Run Playwright Tests
         run: npx playwright test --reporter=html,junit
 
       # =========================================================
-      # 7. Upload HTML report
+      # 7. Compress test results + reports
       # =========================================================
-      - name: 7️⃣ Upload HTML Report
+      - name: Compress Test Results
+        if: always()
+        run: |
+          echo "Compressing Playwright results..."
+
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+          # Create zip file with timestamp
+          zip -r test-results-$TIMESTAMP.zip test-results playwright-report || true
+
+          echo "ZIP_FILE=test-results-$TIMESTAMP.zip" >> $GITHUB_ENV
+
+      # =========================================================
+      # 8. Upload ZIP artifact
+      # =========================================================
+      - name: Upload ZIP Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-results
+          path: |
+            *.zip
+            summary.txt
 
       # =========================================================
-      # 8. Upload JUnit results
+      # 9. Generate test summary
       # =========================================================
-      - name: 8️⃣ Upload JUnit Results
+      - name: Generate Test Summary
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-results
-          path: test-results/
-
-      # =========================================================
-      # 9. Generate test summary (SAFE + PRETTY)
-      # =========================================================
-      - name: 9️⃣ Generate Test Summary
-        id: summary
         run: |
           node << 'EOF'
           const fs = require('fs');
 
           const file = 'test-results/junit.xml';
 
-          // =====================================================
-          // 9.1 Check if JUnit file exists (prevents crash)
-          // =====================================================
           if (!fs.existsSync(file)) {
-            const emptySummary = [
+            const summary = [
               "Playwright Test Report",
               "",
-              "⚠️ No test results generated."
+              "No test results generated."
             ].join("\n");
 
-            fs.writeFileSync('summary.txt', emptySummary);
-            console.log(emptySummary);
+            fs.writeFileSync('summary.txt', summary);
+            console.log(summary);
             process.exit(0);
           }
 
-          // =====================================================
-          // 9.2 Read XML report
-          // =====================================================
           const xml = fs.readFileSync(file, 'utf-8');
 
-          // =====================================================
-          // 9.3 Extract test metrics
-          // =====================================================
           const total = (xml.match(/<testcase/g) || []).length;
           const failed = (xml.match(/<failure/g) || []).length;
           const skipped = (xml.match(/<skipped/g) || []).length;
           const passed = total - failed - skipped;
 
-          // =====================================================
-          // 9.4 Build clean formatted summary
-          // =====================================================
           const summary = [
-            "📊 Playwright Test Report",
+            "Playwright Test Report",
             "=========================",
             "",
-            `1️⃣ Total Tests  : ${total}`,
-            `2️⃣ Passed Tests : ${passed}`,
-            `3️⃣ Failed Tests : ${failed}`,
-            `4️⃣ Skipped Tests: ${skipped}`,
+            `Total Tests  : ${total}`,
+            `Passed       : ${passed}`,
+            `Failed       : ${failed}`,
+            `Skipped      : ${skipped}`,
             "",
             "========================="
           ].join("\n");
 
-          // =====================================================
-          // 9.5 Write summary file
-          // =====================================================
           fs.writeFileSync('summary.txt', summary);
-
           console.log(summary);
           EOF
 
       # =========================================================
       # 10. Upload summary artifact
       # =========================================================
-      - name: 1️⃣0️⃣ Upload Summary Artifact
+      - name: Upload Summary Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -147,34 +138,29 @@ jobs:
       # =========================================================
       # 11. Send email report
       # =========================================================
-      - name: 1️⃣1️⃣ Send Email Report
+      - name: Send Email Report
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
           secure: true
-
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-
-          subject: "📊 Playwright Test Report - Run #${{ github.run_number }}"
-
+          subject: "Playwright Test Report - Run #${{ github.run_number }}"
           to: your_email@gmail.com
-
           from: CI Bot <${{ secrets.EMAIL_USER }}>
-
           body: |
             Hello,
 
             Your Playwright test execution has completed.
 
-            📌 Summary is attached as an artifact in GitHub Actions:
-            - test-summary
-            - playwright-report (HTML with screenshots/logs)
-            - junit-results
+            Artifacts:
+            - Zipped test results (screenshots, traces, reports)
+            - HTML report
+            - Test summary
 
-            🔗 View Run:
+            Run Details:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Regards,

@@ -1,25 +1,35 @@
-import { Page, expect } from '@playwright/test'
-import { BasePage } from './BasePage'
+import { Page, expect } from '@playwright/test';
 
-export class LoginPage extends BasePage {
-    constructor(page: Page) {
-        super(page)
-    }
+export class LoginPage {
+  constructor(private page: Page) {}
 
-    username = () => this.page.locator('input[name="username"]');
-    password = () => this.page.locator(('input[name="password"]'));
-    loginBtn = () => this.page.locator('button[type="submit"]');
+  async goto(uri: string) {
+    await this.page.goto(uri);
+  }
 
-    async login(user: string, pass: string) {
-        await this.username().fill(user);
-        await this.password().fill(pass);
-        await this.loginBtn().click();
+  async login(username: string, password: string) {
+    await this.page.fill('input[name="username"]', username);
+    await this.page.fill('input[name="password"]', password);
+    await this.page.click('button[type="submit"]');
+  }
+
+  async logout() {
+    await this.page.getByAltText('profile picture').click();
+    await this.page.getByRole('menuitem', { name: 'Logout' }).click();
+    
+  }
+
+  async prepareForLogin() {
+    await this.goto('/web/index.php/auth/login');
+    try {
+        await this.logout();
+    } catch (error) {
+        console.warn('Optional setup failed:', error);
     }
     
-    async verifybaseURL() {
-        await expect(this.page).toHaveURL('/web\/index.php\/auth\/login')
-    }
-    async verifyLoginSuccess() {
-        await expect(this.page).toHaveURL(/dashboard\/index/);
-    }
+ }
+
+  async verifysubURL(subURL: string) {
+    await expect(this.page).toHaveURL(subURL);
+  }
 }

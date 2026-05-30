@@ -188,18 +188,6 @@ await page.goto(config.baseURL);
 | `npx playwright codegen`       | Generate Playwright code |
 | `npx playwright install`       | Install browsers         |
 
----
-
-## Best Practices
-
-- Use Page Object Model (POM)
-- Avoid hard-coded waits
-- Prefer Playwright locators over XPath when possible
-- Store test data separately
-- Keep tests independent
-- Use meaningful test names
-- Reuse fixtures and utilities
-
 ## License
 
 This project is intended for internal automation testing purposes.

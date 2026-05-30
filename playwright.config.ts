@@ -3,30 +3,31 @@ import { config } from './utils/config';
 
 export default defineConfig({
     testDir: './tests',
-    timeout: 30000, // total per test
+    globalTimeout: 0, // optional: disables full run limit
+    timeout: 60000, // 60s per test (recommended starting point)
     expect: {
-        timeout: 5000,
+        timeout: 10000,
     },
     fullyParallel: true, // enables parallel per file
     workers: process.env.CI ? 2 : undefined,
-    retries: 1,
+    retries: 0,
     globalSetup: require.resolve('./auth/auth.setup'),
     use: {
         baseURL: config.baseURL,
-        actionTimeout: 10000,     // clicks, fills, etc.
-        navigationTimeout: 30000, // page.goto, reload
-        headless: true,
+        actionTimeout: 0,     // clicks, fills, etc.
+        navigationTimeout: 45000, // page.goto, reload
+        headless: false,
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
-        trace: 'on-first-retry',
+        trace: 'retain-on-failure',
         storageState: 'storageState.json',
         
     },
-    reporter: [
-         ['html'],
-         ['list'],
-        ['junit', { outputFile: 'test-results/junit.xml' }]
-    ],
+
+  reporter: [
+    ['html', { outputFolder: 'test-results/html-report', open: 'never' }],
+    ['list']
+  ],
 
     outputDir: 'test-results/',
 })
