@@ -9,8 +9,9 @@ on:
 jobs:
   ui-tests:
     name: UI Tests
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -27,24 +28,21 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Prepare Directories
-        run: mkdir -p test-results playwright-report
-
-      - name: Run UI Tests
-        run: npx playwright test tests/ui
+      - name: Run UI Tests (Blob)
+        run: npx playwright test tests/ui --reporter=blob
 
       - name: Upload UI Blob Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ui-blob
-          path: |
-            blob-report
+          path: blob-report
 
   api-tests:
     name: API Tests
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -61,28 +59,28 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run API Tests
-        run: npx playwright test tests/api
+      - name: Run API Tests (Blob)
+        run: npx playwright test tests/api --reporter=blob
 
       - name: Upload API Blob Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: api-blob
-          path: |
-            blob-report
+          path: blob-report
 
   merge-report:
     name: Merge Playwright Report
     runs-on: ubuntu-latest
-    needs:
-      - ui-tests
-      - api-tests
+    needs: [ui-tests, api-tests]
     if: always()
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -101,71 +99,16 @@ jobs:
           name: api-blob
           path: merged/api
 
-      - name: Merge Reports
-        run: npx playwright merge-reports --reporter html merged
+      - name: Merge Reports (Single HTML)
+        run: |
+          mkdir -p merged-report
+          npx playwright merge-reports --reporter html merged/ui merged/api
 
-      - name: Generate JSON Report (Step 1)
-        run: node scripts/junit-to-json.js
-
-      - name: Upload Merged Report
+      - name: Upload Merged HTML Report
         uses: actions/upload-artifact@v4
         with:
           name: merged-playwright-report
           path: playwright-report
-
-      - name: Generate Combined Summary
-        run: |
-          node << 'EOF'
-          const fs = require('fs');
-          const path = require('path');
-
-          const files = [];
-
-          function findJUnit(dir) {
-            if (!fs.existsSync(dir)) return;
-
-            for (const item of fs.readdirSync(dir)) {
-              const full = path.join(dir, item);
-
-              if (fs.statSync(full).isDirectory()) {
-                findJUnit(full);
-              } else if (item.endsWith('.xml')) {
-                files.push(full);
-              }
-            }
-          }
-
-          findJUnit('artifacts');
-
-          let total = 0;
-          let failed = 0;
-          let skipped = 0;
-
-          for (const file of files) {
-            const xml = fs.readFileSync(file, 'utf8');
-
-            total += (xml.match(/<testcase/g) || []).length;
-            failed += (xml.match(/<failure/g) || []).length;
-            skipped += (xml.match(/<skipped/g) || []).length;
-          }
-
-          const passed = total - failed - skipped;
-
-          const summary = [
-            'Playwright Combined Test Report',
-            '===============================',
-            '',
-            `Total Tests  : ${total}`,
-            `Passed       : ${passed}`,
-            `Failed       : ${failed}`,
-            `Skipped      : ${skipped}`,
-            '',
-            '==============================='
-          ].join('\n');
-
-          fs.writeFileSync('summary.txt', summary);
-          console.log(summary);
-          EOF
 
       - name: Compress Results
         run: |
@@ -174,9 +117,7 @@ jobs:
 
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-          zip -r playwright-results-$TIMESTAMP.zip \
-            artifacts \
-            summary.txt
+          zip -r playwright-results-$TIMESTAMP.zip playwright-report blob-report
 
       - name: Upload Combined Artifact
         uses: actions/upload-artifact@v4
@@ -184,7 +125,6 @@ jobs:
           name: playwright-results
           path: |
             *.zip
-            summary.txt
 
       - name: Send Email Report
         uses: dawidd6/action-send-mail@v3
@@ -200,12 +140,10 @@ jobs:
           body: |
             Hello,
 
-            UI and API test executions have completed.
+            UI and API test executions have completed successfully.
 
-            Summary:
-            - Combined test results generated
-            - ZIP artifact uploaded
-            - Individual UI/API reports included
+            Merged HTML Report has been generated.
+            ZIP artifact includes full execution logs.
 
             Run Details:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

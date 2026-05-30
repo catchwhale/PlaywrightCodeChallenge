@@ -9,7 +9,7 @@ export default defineConfig({
         timeout: 10000,
     },
     fullyParallel: true, // enables parallel per file
-    workers: process.env.CI ? 4 : undefined,
+    workers: process.env.CI ? 2 : undefined,
     retries: process.env.CI ? 1 : 0,
     globalSetup: require.resolve('./auth/auth.setup'),
     use: {
@@ -24,7 +24,6 @@ export default defineConfig({
         
     },
     reporter: [
-        ['blob'], //REQUIRED for merge-reports
         ['html', { outputFolder: 'playwright-report', open: 'never' }],
         ['junit', { outputFile: 'test-results/junit.xml' }]
       ],

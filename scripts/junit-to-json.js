@@ -39,4 +39,4 @@ fs.writeFileSync(
   JSON.stringify(report, null, 2)
 );
 
-console.log('✅ report.json generated successfully');
+console.log('report.json generated successfully');
