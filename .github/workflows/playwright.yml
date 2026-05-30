@@ -116,7 +116,11 @@ jobs:
 
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-          zip -r playwright-results-$TIMESTAMP.zip playwright-report blob-report
+          zip -r playwright-results-$TIMESTAMP.zip \ 
+          playwright-report \ 
+          blob-report \ 
+          test-results || true
+          echo "ZIP_FILE=playwright-results-$TIMESTAMP.zip" >> $GITHUB_ENV
 
       - name: Upload Combined Artifact
         uses: actions/upload-artifact@v4
@@ -139,13 +143,17 @@ jobs:
           body: |
             Hello,
 
-            UI and API test executions have completed successfully.
+             Your Playwright test execution has completed.
 
-            Merged HTML Report has been generated.
-            ZIP artifact includes full execution logs.
+            📌 Summary:
+            - UI + API tests executed
+            - Merged HTML report generated
+            - ZIP file attached with full artifacts
 
             Run Details:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Regards,
             CI Automation Bot
+
+            attachments: ${{ env.ZIP_FILE }}
