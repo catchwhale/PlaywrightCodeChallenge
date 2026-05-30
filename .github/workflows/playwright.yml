@@ -183,20 +183,12 @@ jobs:
           subject: Playwright Test Report - Run #${{ github.run_number }}
           to: mr_joe8888@yahoo.com
           from: CI Bot <${{ secrets.GMAIL_USERNAME }}>
-          body: |
-            Hello,
+          # =====================================================
+          # HTML EMAIL BODY (NEW DASHBOARD)
+          # =====================================================
+          html_body: file://email.html
 
-             Your Playwright test execution has completed.
-
-            📌 Summary:
-            - UI + API tests executed
-            - Merged HTML report generated
-            - ZIP file attached with full artifacts
-
-            Run Details:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            Regards,
-            CI Automation Bot
-
-            attachments: ${{ env.ZIP_FILE }}
+          # =====================================================
+          # ZIP ATTACHMENT
+          # =====================================================
+          attachments: ${{ env.ZIP_FILE }}
