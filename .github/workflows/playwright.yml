@@ -135,7 +135,7 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: Playwright Test Report - Run #${{ github.run_number }}
           to: mr_joe8888@yahoo.com
-          from: CI Bot <${{ secrets.EMAIL_USER }}>
+          from: CI Bot <${{ secrets.GMAIL_USERNAME }}>
           body: |
             Hello,
 
