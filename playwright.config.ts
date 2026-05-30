@@ -24,10 +24,10 @@ export default defineConfig({
         
     },
 
-  reporter: [
-    ['html', { outputFolder: 'test-results/html-report', open: 'never' }],
-    ['list']
-  ],
+    reporter: [
+        ['html', { outputFolder: 'playwright-report', open: 'never' }],
+        ['junit', { outputFile: 'test-results/junit.xml' }]
+    ],
 
     outputDir: 'test-results/',
 })
