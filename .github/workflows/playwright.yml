@@ -12,6 +12,13 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - ui
+          - api
+
     steps:
       # =========================================================
       # 1. Checkout repository
@@ -49,8 +56,11 @@ jobs:
       # =========================================================
       # 6. Run Playwright tests
       # =========================================================
-      - name: Run Playwright Tests
-        run: npx playwright test --reporter=html,junit --workers=${{ github.run_attempt == 1 && 4 || 2 }}
+      - name: Run Playwright ${{ matrix.suite }} Tests
+        run: |
+          npx playwright test tests/${{ matrix.suite }} \
+           --reporter=html,junit \
+            --workers=${{ github.run_attempt == 1 && 4 || 2 }}
 
       # =========================================================
       # 7. Compress test results + reports
