@@ -131,10 +131,10 @@ jobs:
           server_address: smtp.gmail.com
           server_port: 465
           secure: true
-          username: ${{ secrets.EMAIL_USER }}
-          password: ${{ secrets.EMAIL_PASS }}
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: Playwright Test Report - Run #${{ github.run_number }}
-          to: mr_joe8888l@yahoo.com
+          to: mr_joe8888@yahoo.com
           from: CI Bot <${{ secrets.EMAIL_USER }}>
           body: |
             Hello,
