@@ -122,7 +122,7 @@ jobs:
                 test-results \
                 email.html \
                 summary.txt || true
-                s
+                
           echo "ZIP_FILE=playwright-results-$TIMESTAMP.zip" >> $GITHUB_ENV
 
       - name: Upload Combined Artifact
