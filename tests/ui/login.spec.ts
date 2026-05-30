@@ -1,29 +1,28 @@
-// import {test, expect} from '../../fixtures/test-fixtures';
-// import { LoginPage } from '../../pages/LoginPage';
-// import { testData } from '../../utils/test-data';
-
-// test('User login to the application using provided admin credentials @ui', async ({}) => {
-//     await LoginPage.goto();
-//     await LoginPage.verifybaseURL();
-//     await LoginPage.login(testData.login.username, testData.login.password);
-//     await LoginPage.verifyLoginSuccess();
-// })
-
 import { test, expect } from '../../fixtures/test-fixtures';
+// import { expect } from '@playwright/test';
+
 import { testData } from '../../utils/test-data';
 
-test('User login to the application using provided admin credentials @ui', async ({ loginPage }) => {
+// disable storageState for ALL tests in this file
+test.use({ storageState: undefined });
 
-  await loginPage.goto('/web/index.php/auth/login');
+test('Verify can navigate to the OrangeHRM application @ui',
+  async ({ loginPage }) => {
 
-  await loginPage.logout()
+    await loginPage.prepareForLogin();
+    await loginPage.goto('/');
+    await loginPage.verifysubURL('/web/index.php/auth/login');
+});
 
-  await loginPage.login(
-    testData.login.username,
-    testData.login.password
-  );
 
-  
+test('Verify user login to the application using provided admin credentials @ui',
+  async ({ loginPage }) => {
+    await loginPage.prepareForLogin();
+    
+    await loginPage.login(
+      testData.login.username,
+      testData.login.password
+    );
 
-  await loginPage.verifysubURL('/web\/index.php\/dashboard\/index/');
+    await loginPage.verifysubURL('/web/index.php/dashboard/index');
 });
