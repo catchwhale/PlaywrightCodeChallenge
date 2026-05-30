@@ -33,8 +33,7 @@ jobs:
       - name: Run UI Tests
         run: |
           npx playwright test tests/ui \
-            --reporter=html,junit \
-            --workers=2
+            --reporter=html,junit
 
       - name: Upload UI Results
         if: always()
@@ -71,8 +70,7 @@ jobs:
       - name: Run API Tests
         run: |
           npx playwright test tests/api \
-            --reporter=html,junit \
-            --workers=2
+            --reporter=html,junit
 
       - name: Upload API Results
         if: always()
@@ -188,7 +186,7 @@ jobs:
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
           subject: Playwright Test Report - Run #${{ github.run_number }}
-          to: your_email@gmail.com
+          to: mr_joe8888l@gmail.com
           from: CI Bot <${{ secrets.EMAIL_USER }}>
           body: |
             Hello,
