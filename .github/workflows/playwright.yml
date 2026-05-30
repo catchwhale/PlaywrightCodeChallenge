@@ -116,10 +116,13 @@ jobs:
 
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-          zip -r playwright-results-$TIMESTAMP.zip \ 
-          playwright-report \ 
-          blob-report \ 
-          test-results || true
+          zip -r playwright-results-$TIMESTAMP.zip \
+                playwright-report \
+                blob-report \
+                test-results \
+                email.html \
+                summary.txt || true
+                s
           echo "ZIP_FILE=playwright-results-$TIMESTAMP.zip" >> $GITHUB_ENV
 
       - name: Upload Combined Artifact
@@ -128,6 +131,46 @@ jobs:
           name: playwright-results
           path: |
             *.zip
+
+      - name: Generate HTML Email Dashboard
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+
+          const summary = fs.existsSync('summary.txt')
+            ? fs.readFileSync('summary.txt', 'utf-8')
+            : 'No summary available';
+
+          const runUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+          const html = `
+          <html>
+          <body style="font-family: Arial; background:#f6f8fa; padding:20px;">
+
+            <div style="background:#ffffff; padding:20px; border-radius:10px;">
+              <h2 style="color:#24292f;">📊 Playwright Test Dashboard</h2>
+
+              <pre style="background:#f3f3f3; padding:10px; border-radius:6px;">
+            ${summary}
+              </pre>
+
+              <p>
+                <b>🔗 GitHub Run:</b><br>
+                <a href="${runUrl}">${runUrl}</a>
+              </p>
+
+              <p style="color:#57606a;">
+                Generated automatically by GitHub Actions
+              </p>
+            </div>
+
+          </body>
+          </html>
+          `;
+
+          fs.writeFileSync('email.html', html);
+          console.log('HTML email generated');
+          EOF
 
       - name: Send Email Report
         uses: dawidd6/action-send-mail@v3
