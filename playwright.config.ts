@@ -23,11 +23,16 @@ export default defineConfig({
         storageState: 'storageState.json',
         
     },
-
     reporter: [
+        ['blob'], //REQUIRED for merge-reports
         ['html', { outputFolder: 'playwright-report', open: 'never' }],
         ['junit', { outputFile: 'test-results/junit.xml' }]
-    ],
+      ],
+
+    // reporter: [
+    //     ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    //     ['junit', { outputFile: 'test-results/junit.xml' }]
+    // ],
 
     outputDir: 'test-results/',
 })
