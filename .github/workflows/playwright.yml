@@ -7,81 +7,171 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    name: Run Playwright UI + API Tests
+  ui-tests:
+    name: UI Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        suite:
-          - ui
-          - api
-
     steps:
-      # =========================================================
-      # 1. Checkout repository
-      # =========================================================
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # =========================================================
-      # 2. Setup Node.js
-      # =========================================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # =========================================================
-      # 3. Install dependencies
-      # =========================================================
       - name: Install Dependencies
         run: npm ci
 
-      # =========================================================
-      # 4. Install Playwright browsers
-      # =========================================================
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # =========================================================
-      # 5. Prepare directories
-      # =========================================================
       - name: Prepare Directories
         run: mkdir -p test-results playwright-report
 
-      # =========================================================
-      # 6. Run Playwright tests
-      # =========================================================
-      - name: Run Playwright ${{ matrix.suite }} Tests
+      - name: Run UI Tests
         run: |
-          npx playwright test tests/${{ matrix.suite }} \
-           --reporter=html,junit \
-            --workers=${{ github.run_attempt == 1 && 4 || 2 }}
+          npx playwright test tests/ui \
+            --reporter=html,junit \
+            --workers=4
 
-      # =========================================================
-      # 7. Compress test results + reports
-      # =========================================================
-      - name: Compress Test Results
+      - name: Upload UI Results
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-results
+          path: |
+            test-results
+            playwright-report
+
+  api-tests:
+    name: API Tests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Prepare Directories
+        run: mkdir -p test-results playwright-report
+
+      - name: Run API Tests
         run: |
-          echo "Compressing Playwright results..."
+          npx playwright test tests/api \
+            --reporter=html,junit \
+            --workers=4
+
+      - name: Upload API Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-results
+          path: |
+            test-results
+            playwright-report
+
+  publish-report:
+    name: Publish Combined Report
+    runs-on: ubuntu-latest
+    needs:
+      - ui-tests
+      - api-tests
+    if: always()
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download UI Results
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-results
+          path: artifacts/ui
+
+      - name: Download API Results
+        uses: actions/download-artifact@v4
+        with:
+          name: api-results
+          path: artifacts/api
+
+      - name: Generate Combined Summary
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          const files = [];
+
+          function findJUnit(dir) {
+            if (!fs.existsSync(dir)) return;
+
+            for (const item of fs.readdirSync(dir)) {
+              const full = path.join(dir, item);
+
+              if (fs.statSync(full).isDirectory()) {
+                findJUnit(full);
+              } else if (item.endsWith('.xml')) {
+                files.push(full);
+              }
+            }
+          }
+
+          findJUnit('artifacts');
+
+          let total = 0;
+          let failed = 0;
+          let skipped = 0;
+
+          for (const file of files) {
+            const xml = fs.readFileSync(file, 'utf8');
+
+            total += (xml.match(/<testcase/g) || []).length;
+            failed += (xml.match(/<failure/g) || []).length;
+            skipped += (xml.match(/<skipped/g) || []).length;
+          }
+
+          const passed = total - failed - skipped;
+
+          const summary = [
+            'Playwright Combined Test Report',
+            '===============================',
+            '',
+            `Total Tests  : ${total}`,
+            `Passed       : ${passed}`,
+            `Failed       : ${failed}`,
+            `Skipped      : ${skipped}`,
+            '',
+            '==============================='
+          ].join('\n');
+
+          fs.writeFileSync('summary.txt', summary);
+          console.log(summary);
+          EOF
+
+      - name: Compress Results
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
 
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-          # Create zip file with timestamp
-          zip -r test-results-$TIMESTAMP.zip test-results playwright-report || true
+          zip -r playwright-results-$TIMESTAMP.zip \
+            artifacts \
+            summary.txt
 
-          echo "ZIP_FILE=test-results-$TIMESTAMP.zip" >> $GITHUB_ENV
-
-      # =========================================================
-      # 8. Upload ZIP artifact
-      # =========================================================
-      - name: Upload ZIP Artifact
-        if: always()
+      - name: Upload Combined Artifact
         uses: actions/upload-artifact@v4
         with:
           name: playwright-results
@@ -89,67 +179,7 @@ jobs:
             *.zip
             summary.txt
 
-      # =========================================================
-      # 9. Generate test summary
-      # =========================================================
-      - name: Generate Test Summary
-        if: always()
-        run: |
-          node << 'EOF'
-          const fs = require('fs');
-
-          const file = 'test-results/junit.xml';
-
-          if (!fs.existsSync(file)) {
-            const summary = [
-              "Playwright Test Report",
-              "",
-              "No test results generated."
-            ].join("\n");
-
-            fs.writeFileSync('summary.txt', summary);
-            console.log(summary);
-            process.exit(0);
-          }
-
-          const xml = fs.readFileSync(file, 'utf-8');
-
-          const total = (xml.match(/<testcase/g) || []).length;
-          const failed = (xml.match(/<failure/g) || []).length;
-          const skipped = (xml.match(/<skipped/g) || []).length;
-          const passed = total - failed - skipped;
-
-          const summary = [
-            "Playwright Test Report",
-            "=========================",
-            "",
-            `Total Tests  : ${total}`,
-            `Passed       : ${passed}`,
-            `Failed       : ${failed}`,
-            `Skipped      : ${skipped}`,
-            "",
-            "========================="
-          ].join("\n");
-
-          fs.writeFileSync('summary.txt', summary);
-          console.log(summary);
-          EOF
-
-      # =========================================================
-      # 10. Upload summary artifact
-      # =========================================================
-      - name: Upload Summary Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-summary
-          path: summary.txt
-
-      # =========================================================
-      # 11. Send email report
-      # =========================================================
       - name: Send Email Report
-        if: always()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -157,18 +187,18 @@ jobs:
           secure: true
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-          subject: "Playwright Test Report - Run #${{ github.run_number }}"
+          subject: Playwright Test Report - Run #${{ github.run_number }}
           to: your_email@gmail.com
           from: CI Bot <${{ secrets.EMAIL_USER }}>
           body: |
             Hello,
 
-            Your Playwright test execution has completed.
+            UI and API test executions have completed.
 
-            Artifacts:
-            - Zipped test results (screenshots, traces, reports)
-            - HTML report
-            - Test summary
+            Summary:
+            - Combined test results generated
+            - ZIP artifact uploaded
+            - Individual UI/API reports included
 
             Run Details:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

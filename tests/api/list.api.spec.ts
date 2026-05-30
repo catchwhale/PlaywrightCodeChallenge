@@ -82,7 +82,7 @@ test('Verify search for the employee created in UI using Employee ID @api', asyn
 });
 
 
-test.only('Verify to validate UI data matches API response (Employee details consistency) @e2e', async ({ page }) => {
+test('Verify to validate UI data matches API response (Employee details consistency) @api @e2e', async ({ page }) => {
 
   // API context with session
   const apiContext = await request.newContext({
