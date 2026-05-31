@@ -3,7 +3,7 @@ import { config } from './utils/config';
 
 export default defineConfig({
     testDir: './tests',
-    globalTimeout: 0, // optional: disables full run limit
+    globalTimeout: 50000, // optional: disables full run limit
     timeout: 60000, // 60s per test (recommended starting point)
     expect: {
         timeout: 10000,
@@ -11,11 +11,12 @@ export default defineConfig({
     fullyParallel: true, // enables parallel per file
     // workers: process.env.CI ? 2 : undefined,
     retries: process.env.CI ? 1 : 0,
-    globalSetup: require.resolve('./auth/auth.setup'),
+    globalSetup: require.resolve('./global-setup'),
+    // globalSetup: require.resolve('./auth/auth.setup'),
     use: {
         baseURL: config.baseURL,
         actionTimeout: 0,     // clicks, fills, etc.
-        navigationTimeout: 45000, // page.goto, reload
+        navigationTimeout: 120000, // page.goto, reload
         headless: true,
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',

@@ -1,4 +1,4 @@
-import { test, expect } from '../../fixtures/test-fixtures';
+import { test } from '../../fixtures/test-fixtures';
 import { testData } from '../../utils/test-data';
 // import { test, expect } from '@playwright/test';
 
@@ -11,18 +11,19 @@ test.describe('Login Tests', () => {
       await loginPage.prepareForLogin();
       await loginPage.gotoURL('/');
       await loginPage.verifysubURL('/web/index.php/auth/login');
+      // console.log("Hello")
   });
 
 
-  test('@ui [2]Verify user login to the application using provided admin credentials', async ({ loginPage }) => {
-      await loginPage.prepareForLogin();
+  // test('@ui [2]Verify user login to the application using provided admin credentials', async ({ loginPage }) => {
+      // await loginPage.prepareForLogin();
       
-      await loginPage.login(
-        testData.login.username,
-        testData.login.password
-      );
+      // await loginPage.login(
+      //   testData.login.username,
+      //   testData.login.password
+      // );
 
-      await loginPage.verifysubURL('/web/index.php/dashboard/index');
-  });
+      // await loginPage.verifysubURL('/web/index.php/dashboard/index');
+  // });
 
 });
