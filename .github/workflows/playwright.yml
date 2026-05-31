@@ -33,6 +33,13 @@ jobs:
         run: |
           npx playwright test tests/ui
 
+      - name: Prepare UI JSON
+        if: always()
+        run: |
+          ls -la
+          test -f test-results.json
+          cp test-results.json ui-results.json
+
       - name: Verify UI JSON Exists
         if: always()
         run: |
@@ -80,7 +87,14 @@ jobs:
         run: |
           npx playwright test tests/api
 
-      - name: Verify UI JSON Exists
+      - name: Prepare API JSON
+        if: always()
+        run: |
+          ls -la
+          test -f test-results.json
+          cp test-results.json api-results.json
+
+      - name: Verify API JSON Exists
         if: always()
         run: |
           ls -la
@@ -135,13 +149,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-json
-          path: test-results
+          path: results
 
       - name: Download API JSON
         uses: actions/download-artifact@v4
         with:
           name: api-json
-          path: test-results
+          path: results
 
       - name: Merge Reports (Single HTML)
         run: npx playwright merge-reports --reporter html merged
@@ -157,8 +171,13 @@ jobs:
           node << 'EOF'
           const fs = require('fs');
 
-          const uiFile = 'test-results/ui-results.json';
-          const apiFile = 'test-results/api-results.json';
+          //Ensure output directory exists
+          fs.mkdirSync('results/ui', { recursive: true });
+          fs.mkdirSync('results/api', { recursive: true });
+          fs.mkdirSync('results/combined', { recursive: true });
+
+          const uiFile = 'results/ui-results.json';
+          const apiFile = 'results/api-results.json';
 
           function load(file) {
             if (!fs.existsSync(file)) return null;
@@ -234,8 +253,8 @@ jobs:
           const fs = require('fs');
 
           const files = [
-            'test-results/ui-results.json',
-            'test-results/api-results.json'
+            'results/ui-results.json',
+            'results/api-results.json'
           ];
 
           let total = 0;
