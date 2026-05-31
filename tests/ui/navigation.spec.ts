@@ -31,8 +31,8 @@ test.describe('OrangeHRM Navigation Menu', () => {
     const dashboardPage = new DashboardPage(page);
 
     await test.step('Navigate to OrangeHRM application', async () => {
-      await loginPage.gotoURL('/web/index.php/dashboard/index');
-      await loginPage.verifysubURL('/index');
+      await loginPage.gotoURL('/');
+      await loginPage.verifysubURL('/dashboard');
     });
 
     await test.step('Navigate to PIM module', async () => {
