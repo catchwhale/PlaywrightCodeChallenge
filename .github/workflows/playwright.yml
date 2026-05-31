@@ -217,8 +217,8 @@ jobs:
           node << 'EOF'
           const fs = require('fs');
 
-          const uiFile = 'test-results/ui-results.json';
-          const apiFile = 'test-results/api-results.json';
+          const uiFile = 'results/ui-results.json';
+          const apiFile = 'results/api-results.json';
 
           function load(file) {
             if (!fs.existsSync(file)) return null;
@@ -410,8 +410,8 @@ jobs:
           }
 
           const files = [
-            'test-results/ui-results.json',
-            'test-results/api-results.json'
+            'results/ui-results.json',
+            'results/api-results.json'
           ];
 
           for (const file of files) {
