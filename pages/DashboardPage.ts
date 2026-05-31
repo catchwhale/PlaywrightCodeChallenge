@@ -1,22 +1,10 @@
 import { Page, expect } from '@playwright/test';
+import { MENU_ITEMS } from '../constants/menuData';
 
 export class DashboardPage {
   constructor(private page: Page) {}
 
-  readonly menus = [
-    { name: 'Admin', url: '/admin/' },
-    { name: 'PIM', url: '/pim/' },
-    { name: 'Leave', url: '/leave/' },
-    { name: 'Time', url: '/time/' },
-    { name: 'Recruitment', url: '/recruitment/' },
-    { name: 'My Info', url: '/viewPersonalDetails' },
-    { name: 'Performance', url: '/performance/' },
-    { name: 'Dashboard', url: '/dashboard/' },
-    { name: 'Directory', url: '/directory/' },
-    { name: 'Maintenance', url: '/maintenance/' },
-    { name: 'Claim', url: '/claim/' },
-    { name: 'Buzz', url: '/buzz/' }
-  ];
+  readonly menus = MENU_ITEMS;
 
   async verifyMenuVisible(menuName: string) {
     await expect(
@@ -33,4 +21,9 @@ export class DashboardPage {
       new RegExp(expectedUrl.replace(/\//g, '\\/'))
     );
   }
+  
+  async navigateToPIM() {
+    await this.page.getByRole('link', { name: 'PIM' }).click();
+  }
+  
 }
