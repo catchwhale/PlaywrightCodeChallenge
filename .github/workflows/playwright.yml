@@ -294,7 +294,7 @@ jobs:
             <body>
 
             <div class="card">
-              <h2>🚀 Playwright Test Dashboard</h2>
+              <h2>Playwright Test Dashboard</h2>
               <p><b>Run:</b> <a href="${runUrl}">${runUrl}</a></p>
             </div>
 
@@ -353,6 +353,7 @@ jobs:
             `;
 
           fs.writeFileSync('playwright-dashboard.html', html);
+          fs.writeFileSync('email.html', html);
           console.log('Dashboard generated');
           EOF
 
@@ -461,6 +462,8 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: Playwright Test Report - Run #${{ github.run_number }}
           to: mr_joe8888@yahoo.com
-          from: CI Bot Automation <#${{ github.run_number }}>
-          html_body: file://email.html
-          attachments: playwright-dashboard.html
+          from: CI Bot Automation <${{ secrets.GMAIL_USERNAME }}>
+          html_body: file://playwright-dashboard.html
+          attachments: |
+            playwright-dashboard.html
+            summary.txt
