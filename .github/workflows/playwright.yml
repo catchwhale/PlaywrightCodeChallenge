@@ -480,4 +480,3 @@ jobs:
           html_body: file://playwright-dashboard.html
           attachments: |
             playwright-dashboard.html
-            summary.txt
