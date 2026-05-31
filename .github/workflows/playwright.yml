@@ -8,7 +8,7 @@ on:
 
 jobs:
   ui-tests:
-    name: UI Tests
+    name: Run UI Tests
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -29,7 +29,11 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run UI Tests (Blob)
-        run: npx playwright test tests/ui --reporter=blob || true
+        continue-on-error: true
+        run: |
+          npx playwright test tests/ui \
+          --reporter=blob,json
+          mv test-results.json ui-results.json
 
       - name: Upload UI Blob Report
         if: always()
@@ -37,6 +41,13 @@ jobs:
         with:
           name: ui-blob
           path: blob-report
+
+      - name: Upload UI JSON Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-json
+          path: ui-results.json
 
   api-tests:
     name: API Tests
@@ -60,7 +71,11 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run API Tests (Blob)
-        run: npx playwright test tests/api --reporter=blob || true
+        continue-on-error: true
+        run: |
+          npx playwright test tests/api \
+            --reporter=blob,json
+          mv test-results.json api-results.json
 
       - name: Upload API Blob Report
         if: always()
@@ -68,6 +83,13 @@ jobs:
         with:
           name: api-blob
           path: blob-report
+
+      - name: Upload API JSON Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-json
+          path: api-results.json
 
   merge-report:
     name: Merge Playwright Report
@@ -99,9 +121,20 @@ jobs:
           name: api-blob
           path: merged
 
+      - name: Download UI JSON
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-json
+          path: reports
+
+      - name: Download API JSON
+        uses: actions/download-artifact@v4
+        with:
+          name: api-json
+          path: reports
+
       - name: Merge Reports (Single HTML)
-        run: |
-          npx playwright merge-reports --reporter html merged
+        run: npx playwright merge-reports --reporter html merged
 
       - name: Upload Merged HTML Report
         uses: actions/upload-artifact@v4
@@ -148,6 +181,111 @@ jobs:
           fs.writeFileSync('email.html', html);
           console.log('HTML email generated');
           EOF
+
+      - name: Generate Combined Summary
+        if: always()
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+
+          const files = [
+            'reports/ui-results.json',
+            'reports/api-results.json'
+          ];
+
+          let total = 0;
+          let passed = 0;
+          let failed = 0;
+          let flaky = 0;
+
+          const failedTests = [];
+
+          function processSuite(suite) {
+            if (suite.specs) {
+              for (const spec of suite.specs) {
+                for (const test of (spec.tests || [])) {
+
+                  total++;
+
+                  const results = test.results || [];
+
+                  const hasPassed = results.some(r => r.status === 'passed');
+                  const hasFailed = results.some(r => r.status === 'failed');
+
+                  if (hasPassed && hasFailed) {
+                    flaky++;
+                  } else if (hasPassed) {
+                    passed++;
+                  } else {
+                    failed++;
+                  }
+
+                  if (hasFailed) {
+                    failedTests.push({
+                      title: spec.title,
+                      retries: results.length - 1
+                    });
+                  }
+                }
+              }
+            }
+
+            for (const child of (suite.suites || [])) {
+              processSuite(child);
+            }
+          }
+
+          for (const file of files) {
+
+            if (!fs.existsSync(file)) continue;
+
+            const report = JSON.parse(
+              fs.readFileSync(file, 'utf8')
+            );
+
+            for (const suite of (report.suites || [])) {
+              processSuite(suite);
+            }
+          }
+
+          const runUrl =
+            `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+          let summary = `
+          PLAYWRIGHT EXECUTION SUMMARY
+          ============================
+
+          Total Tests Executed : ${total}
+          Passed              : ${passed}
+          Failed              : ${failed}
+          Flaky / Retried     : ${flaky}
+
+          Failed Tests
+          ------------
+          `;
+
+            if (failedTests.length === 0) {
+              summary += 'None\n';
+            } else {
+              failedTests.forEach(t => {
+                summary += `- ${t.title} (Retries: ${t.retries})\n`;
+              });
+            }
+
+            summary += `
+          Artifacts:
+          ${runUrl}
+
+          Failure Screenshots/Logs:
+          Download from workflow artifacts:
+          - merged-playwright-report
+          - playwright-results
+          `;
+
+            fs.writeFileSync('summary.txt', summary);
+
+            console.log(summary);
+            EOF
 
       - name: Compress Results
         run: |

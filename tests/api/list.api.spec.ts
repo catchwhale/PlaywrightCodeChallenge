@@ -46,7 +46,7 @@ test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 });
 
 
-test.only('@api [2]Verify search for the employee created in UI using Employee ID', async ({ page }) => {
+test('@api [2]Verify search for the employee created in UI using Employee ID', async ({ page }) => {
 
   // Reuse authenticated session
   const apiContext = await request.newContext({
