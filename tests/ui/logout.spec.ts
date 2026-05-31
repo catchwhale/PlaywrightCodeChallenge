@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
+import { env } from '../..//config/env';
 
 test.describe('@ui Logout Tests - OrangeHRM', () => {
   test('@ui [8] Verify can Logout from the application', async ({ page }) => {

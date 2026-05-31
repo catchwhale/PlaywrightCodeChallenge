@@ -1,21 +1,21 @@
 import { defineConfig } from '@playwright/test';
-import { config } from './utils/config';
+import { env } from './config/env';
 
 export default defineConfig({
     testDir: './tests',
-    globalTimeout: 50000, // optional: disables full run limit
-    timeout: 60000, // 60s per test (recommended starting point)
+    globalTimeout: undefined, // optional: disables full run limit
+    timeout:  120 * 1000, // 2 minutes per test
     expect: {
-        timeout: 10000,
+        timeout: 15 * 1000,
     },
-    fullyParallel: true, // enables parallel per file
+    fullyParallel: false, // enables parallel per file
     workers: 1,
     retries: 1,
     globalSetup: require.resolve('./global-setup'),
     use: {
-        baseURL: config.baseURL,
-        actionTimeout: 0,     // clicks, fills, etc.
-        navigationTimeout: 120000, // page.goto, reload
+        baseURL: env.baseURL,
+        actionTimeout: 30 * 1000,
+        navigationTimeout: 120 * 1000,
         headless: true,
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',

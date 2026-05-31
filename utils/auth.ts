@@ -14,4 +14,6 @@ export async function login() {
 
     await page.context().storageState({ path: 'storageState.json' });
     await browser.close();
+    await page.context().close();
+
 }
