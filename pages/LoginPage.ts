@@ -20,7 +20,7 @@ export class LoginPage {
   }
 
   async prepareForLogin() {
-    await this.goto('/web/index.php/auth/login');
+    await this.page.goto('/web/index.php/auth/login');
     try {
         await this.logout();
     } catch (error) {
@@ -31,5 +31,17 @@ export class LoginPage {
 
   async verifysubURL(subURL: string) {
     await expect(this.page).toHaveURL(subURL);
+  }
+
+  async verifyPlaceholderVisible(placeholder: string) {
+    await expect(
+      this.page.getByPlaceholder(placeholder)
+    ).toBeVisible();
+  }
+
+  async verifyLoginButtonVisible(buttonName: string) {
+    await expect(
+      this.page.getByRole('button', { name: buttonName })
+    ).toBeVisible();
   }
 }

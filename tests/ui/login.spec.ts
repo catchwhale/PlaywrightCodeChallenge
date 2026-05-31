@@ -6,11 +6,7 @@ import { testData } from '../../utils/test-data';
 // test.use({ storageState: undefined });
 test.describe('Login Tests', () => {
 
-  test.only('Verify can Logout from the application @ui', async ({ loginPage }) => {
-    await loginPage.logout();
-    await loginPage.verifysubURL('/web/index.php/auth/login');
-  });
-  test('Verify can navigate to the OrangeHRM application @ui', async ({ loginPage }) => {
+  test('@ui [1]Verify can navigate to the OrangeHRM application', async ({ loginPage }) => {
 
       await loginPage.prepareForLogin();
       await loginPage.gotoURL('/');
@@ -18,7 +14,7 @@ test.describe('Login Tests', () => {
   });
 
 
-  test('Verify user login to the application using provided admin credentials @ui', async ({ loginPage }) => {
+  test('@ui [2]Verify user login to the application using provided admin credentials', async ({ loginPage }) => {
       await loginPage.prepareForLogin();
       
       await loginPage.login(

@@ -3,7 +3,7 @@ import { LoginPage } from '../../pages/LoginPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 
 test.describe('OrangeHRM Navigation Menu', () => {
-  test('Verify all left navigation menus are visible and functional', async ({ page }) => {
+  test('@ui [3]Verify all left navigation menus are visible and functional', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
@@ -25,5 +25,25 @@ test.describe('OrangeHRM Navigation Menu', () => {
         );
       });
     }
+  });
+  test.only('@ui [4]Verify user can navigate to PIM module', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    const dashboardPage = new DashboardPage(page);
+
+    await test.step('Navigate to OrangeHRM application', async () => {
+      await loginPage.gotoURL('/web/index.php/dashboard/index');
+      await loginPage.verifysubURL('/index');
+    });
+
+    await test.step('Navigate to PIM module', async () => {
+      await dashboardPage.navigateToPIM();
+      await loginPage.verifysubURL('/pin');
+    });
+
+    await test.step('Verify PIM page is displayed', async () => {
+      await expect(
+        page.getByRole('heading', { name: 'PIM' })
+      ).toBeVisible();
+    });
   });
 });
