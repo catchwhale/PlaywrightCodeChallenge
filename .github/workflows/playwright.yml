@@ -125,13 +125,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-json
-          path: reports
+          path: ui-results.json
 
       - name: Download API JSON
         uses: actions/download-artifact@v4
         with:
           name: api-json
-          path: reports
+          path: api-results.json
 
       - name: Merge Reports (Single HTML)
         run: npx playwright merge-reports --reporter html merged
