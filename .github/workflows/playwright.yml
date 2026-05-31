@@ -31,9 +31,14 @@ jobs:
       - name: Run UI Tests (Blob)
         continue-on-error: true
         run: |
-          npx playwright test tests/ui \
-          --reporter=blob,json
-          mv test-results.json ui-results.json
+          npx playwright test tests/ui
+
+      - name: Verify UI JSON Exists
+        if: always()
+        run: |
+          ls -la
+          test -f test-results.json
+          cp test-results.json ui-results.json
 
       - name: Upload UI Blob Report
         if: always()
@@ -73,9 +78,14 @@ jobs:
       - name: Run API Tests (Blob)
         continue-on-error: true
         run: |
-          npx playwright test tests/api \
-            --reporter=blob,json
-          mv test-results.json api-results.json
+          npx playwright test tests/api
+
+      - name: Verify UI JSON Exists
+        if: always()
+        run: |
+          ls -la
+          test -f test-results.json
+          cp test-results.json api-results.json
 
       - name: Upload API Blob Report
         if: always()
