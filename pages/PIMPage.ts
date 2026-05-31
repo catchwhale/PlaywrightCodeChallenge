@@ -45,4 +45,29 @@ export class PIMPage {
       this.page.getByText(fullName, { exact: true })
     ).toBeVisible();
   }
+
+  async getEmployeeDetails() {
+    const employeeId = await this.page
+      .locator('input')
+      .filter({ has: this.page.locator('label:text("Employee Id")') })
+      .inputValue();
+
+    const firstName = await this.page
+      .locator('input[name="firstName"]')
+      .inputValue();
+
+    const lastName = await this.page
+      .locator('input[name="lastName"]')
+      .inputValue();
+
+    const jobTitle = await this.page
+      .locator('.orangehrm-edit-employee-content')
+      .textContent();
+
+    return {
+      employeeId,
+      fullName: `${firstName} ${lastName}`,
+      jobTitle
+    };
+  }
 }

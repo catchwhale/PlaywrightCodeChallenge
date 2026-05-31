@@ -1,4 +1,6 @@
 import { test, expect, request } from '@playwright/test';
+import { generateEmployeeName } from '../../utils/randomData';
+import { PIMPage } from '../../pages/PIMPage';
 
 test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 
@@ -44,15 +46,22 @@ test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 });
 
 
-test('@api [2]Verify search for the employee created in UI using Employee ID', async () => {
+test.only('@api [2]Verify search for the employee created in UI using Employee ID', async ({ page }) => {
 
   // Reuse authenticated session
   const apiContext = await request.newContext({
     storageState: 'storageState.json',
   });
+  // Login UI
+  // Create employee UI
+  const pimPage = new PIMPage(page);
+  const employee = generateEmployeeName();
+  const firstName = employee.firstName;
+  const lastName = employee.lastName;
 
+  const employeeId = await pimPage.addEmployee(firstName, lastName);
   // Replace this with actual Employee ID from UI creation test
-  const employeeId = '0001';
+  // const employeeId = '0001';
 
   // 📡 API request (search employee)
   const response = await apiContext.get(
@@ -89,8 +98,14 @@ test('@api [3]Validate that UI data matches API response (name, job title, emplo
     storageState: 'storageState.json',
   });
 
-  // Employee ID (should come from UI creation flow in real scenario)
-  const employeeId = '0001';
+  // Login UI
+  // Create employee UI
+  const pimPage = new PIMPage(page);
+  const employee = generateEmployeeName();
+  const firstName = employee.firstName;
+  const lastName = employee.lastName;
+
+  const employeeId = await pimPage.addEmployee(firstName, lastName);
 
   // =========================
   // STEP 1: GET DATA FROM API

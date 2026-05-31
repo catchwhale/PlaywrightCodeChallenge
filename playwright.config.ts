@@ -9,7 +9,7 @@ export default defineConfig({
         timeout: 10000,
     },
     fullyParallel: true, // enables parallel per file
-    workers: process.env.CI ? 2 : undefined,
+    // workers: process.env.CI ? 2 : undefined,
     retries: process.env.CI ? 1 : 0,
     globalSetup: require.resolve('./auth/auth.setup'),
     use: {
