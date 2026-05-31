@@ -3,8 +3,8 @@ import { Page, expect } from '@playwright/test';
 export class LoginPage {
   constructor(private page: Page) {}
 
-  async goto(uri: string) {
-    await this.page.goto(uri);
+  async gotoURL(url: string) {
+    await this.page.goto(url);
   }
 
   async login(username: string, password: string) {

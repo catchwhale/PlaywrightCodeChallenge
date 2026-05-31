@@ -16,7 +16,7 @@ export default defineConfig({
         baseURL: config.baseURL,
         actionTimeout: 0,     // clicks, fills, etc.
         navigationTimeout: 45000, // page.goto, reload
-        headless: true,
+        headless: false,
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         trace: 'retain-on-failure',
