@@ -288,6 +288,7 @@ jobs:
             EOF
 
       - name: Compress Results
+        continue-on-error: true
         run: |
           sudo apt-get update
           sudo apt-get install -y zip
@@ -299,13 +300,9 @@ jobs:
                 blob-report \
                 test-results \
                 email.html \
-                summary.txt || true
+                summary.txt 
 
           echo "ZIP_FILE=playwright-results-$TIMESTAMP.zip" >> $GITHUB_ENV
-
-      - name: Create Summary
-        run: |
-          echo "Playwright execution completed." > summary.txt
 
       - name: Upload Combined Artifact
         uses: actions/upload-artifact@v4
