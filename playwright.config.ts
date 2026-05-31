@@ -9,7 +9,8 @@ export default defineConfig({
         timeout: 10000,
     },
     fullyParallel: true, // enables parallel per file
-    retries: process.env.CI ? 1 : 0,
+    workers: 1,
+    retries: 1,
     globalSetup: require.resolve('./global-setup'),
     use: {
         baseURL: config.baseURL,
