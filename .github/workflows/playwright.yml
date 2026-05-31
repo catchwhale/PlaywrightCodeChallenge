@@ -247,15 +247,9 @@ jobs:
           EOF
 
       - name: Generate Combined Summary
-        if: always()
         run: |
           node << 'EOF'
           const fs = require('fs');
-
-          const files = [
-            'results/ui-results.json',
-            'results/api-results.json'
-          ];
 
           let total = 0;
           let passed = 0;
@@ -263,92 +257,64 @@ jobs:
           let flaky = 0;
 
           const failedTests = [];
+          const flakyTests = [];
+
+          // REPLACE OLD processSuite-based logic
+          function processTest(test) {
+            const results = test.results || [];
+
+            total++;
+
+            const isFlaky =
+              results.length > 1 &&
+              results[0]?.status === 'failed' &&
+              results.some(r => r.status === 'passed');
+
+            if (isFlaky) {
+              flaky++;
+              flakyTests.push({
+                title: test.title,
+                retries: results.length - 1
+              });
+            } else if (results.some(r => r.status === 'passed')) {
+              passed++;
+            } else {
+              failed++;
+              failedTests.push({
+                title: test.title,
+                retries: results.length - 1
+              });
+            }
+          }
 
           function processSuite(suite) {
-            if (suite.specs) {
-              for (const spec of suite.specs) {
-                for (const test of (spec.tests || [])) {
-
-                  total++;
-
-                  const results = test.results || [];
-
-                  const hasPassed = results.some(r => r.status === 'passed');
-                  const hasFailed = results.some(r => r.status === 'failed');
-
-                  if (hasPassed && hasFailed) {
-                    flaky++;
-                  } else if (hasPassed) {
-                    passed++;
-                  } else {
-                    failed++;
-                  }
-
-                  if (hasFailed) {
-                    failedTests.push({
-                      title: spec.title,
-                      retries: results.length - 1
-                    });
-                  }
-                }
+            for (const spec of suite.specs || []) {
+              for (const test of spec.tests || []) {
+                processTest(test);
               }
             }
 
-            for (const child of (suite.suites || [])) {
+            for (const child of suite.suites || []) {
               processSuite(child);
             }
           }
 
-          for (const file of files) {
+          const files = [
+            'test-results/ui-results.json',
+            'test-results/api-results.json'
+          ];
 
+          for (const file of files) {
             if (!fs.existsSync(file)) continue;
 
-            const report = JSON.parse(
-              fs.readFileSync(file, 'utf8')
-            );
+            const report = JSON.parse(fs.readFileSync(file, 'utf8'));
 
-            for (const suite of (report.suites || [])) {
+            for (const suite of report.suites || []) {
               processSuite(suite);
             }
           }
 
-          const runUrl =
-            `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-
-          let summary = `
-          PLAYWRIGHT EXECUTION SUMMARY
-          ============================
-
-          Total Tests Executed : ${total}
-          Passed              : ${passed}
-          Failed              : ${failed}
-          Flaky / Retried     : ${flaky}
-
-          Failed Tests
-          ------------
-          `;
-
-            if (failedTests.length === 0) {
-              summary += 'None\n';
-            } else {
-              failedTests.forEach(t => {
-                summary += `- ${t.title} (Retries: ${t.retries})\n`;
-              });
-            }
-
-            summary += `
-          Artifacts:
-          ${runUrl}
-
-          Failure Screenshots/Logs:
-          Download from workflow artifacts:
-          - merged-playwright-report
-          - playwright-results
-          `;
-
-            fs.writeFileSync('summary.txt', summary);
-
-          console.log(summary);
+          console.log({ total, passed, failed, flaky });
           EOF
 
       - name: Compress Results
