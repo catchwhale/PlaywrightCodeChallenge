@@ -247,12 +247,18 @@ jobs:
 
             if (isFlaky) {
               flaky++;
-              flakyTests.push(test.title);
+              flakyTests.push({
+                title: test.title || 'Unknown Test',
+                retries: results.length - 1
+              });
             } else if (results.some(r => r.status === 'passed')) {
               passed++;
             } else {
               failed++;
-              failedTests.push(test.title);
+              failedTests.push({
+                title: test.title || 'Unknown Test',
+                retries: results.length - 1
+              });
             }
           }
 
@@ -320,11 +326,18 @@ jobs:
             <div class="card">
               <h3>Failed Tests</h3>
               <ul>
-                ${failedTests.map(t => `
-                  <li>
-                    ${t.title} (Retries: ${t.retries})
-                  </li>
-                `).join('')}
+                ${
+                failedTests.length
+                  ? failedTests
+                      .filter(t => t)
+                      .map(t => `
+                        <li>
+                          ${t.title || 'Unknown Test'} (Retries: ${t.retries ?? 0})
+                        </li>
+                      `)
+                      .join('')
+                  : '<li>None</li>'
+                }
               </ul>
             </div>
 
@@ -332,19 +345,8 @@ jobs:
                 <h3>Flaky Tests</h3>
                 <ul>
                   ${flakyTests.map(t => `
-                    <li>
-                      ${t.title} (Retries: ${t.retries})
-                    </li>
-                  `).join('')}
-                </ul>
-              </div>
-              
-              <ul>
-                ${
-                  failedTests.length
-                    ? failedTests.map(t => `<li>${t.title} (${t.retries} retries)</li>`).join('')
-                    : '<li>None</li>'
-                }
+                  <li>${t.title}</li>
+                `).join('')}
               </ul>
 
             <script>
