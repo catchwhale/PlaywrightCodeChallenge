@@ -1,145 +1,74 @@
 # Playwright Test Automation Framework
 
-Automated UI testing framework built with Playwright and TypeScript.
+Automated UI and API testing framework built with Playwright and TypeScript.
 
 ## Features
 
 - Cross-browser testing (Chromium, Firefox, WebKit)
-- Parallel test execution
-- Page Object Model (POM) support
-- HTML test reports
-- Screenshots on failure
-- Video recording support
-- Trace viewer integration
+- Parallel execution
+- Page Object Model (POM)
+- HTML reports, screenshots, videos, and traces
 - Environment-based configuration
-- CI/CD ready
-
----
+- GitHub Actions CI/CD integration
 
 ## Prerequisites
 
-Before running the project, install:
-
-- Node.js (LTS version recommended)
+- Node.js (LTS)
 - npm
-
-Verify installation:
 
 ```bash
 node -v
 npm -v
 ```
 
----
-
-## Installation
-
-Clone the repository:
+## Setup
 
 ```bash
 git clone <repository-url>
 cd <project-folder>
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Install Playwright browsers:
-
-```bash
 npx playwright install
 ```
-
----
 
 ## Project Structure
 
 ```text
-project-root/
-│
-├── tests/                  # Test files
-├── pages/                  # Page Object Models
-├── fixtures/               # Custom fixtures
-├── test-data/              # Test data
-├── utils/                  # Utility functions
-├── config/                 # Environment configuration
-├── playwright.config.ts    # Playwright configuration
-├── package.json
-└── README.md
+tests/              Test files
+pages/              Page Objects
+fixtures/           Custom fixtures
+test-data/          Test data
+utils/              Utilities
+config/             Environment configs
+playwright.config.ts
 ```
 
----
-
-## Running Tests
-
-### Run all tests
+## Run Tests
 
 ```bash
+# Run all tests
 npx playwright test
-```
 
-### Run a specific test file
-
-```bash
+# Run a specific test
 npx playwright test tests/login.spec.ts
-```
 
-### Run tests in headed mode
-
-```bash
+# Run in headed mode
 npx playwright test --headed
-```
 
-### Run tests in a specific browser
-
-Chromium:
-
-```bash
+# Run by browser
 npx playwright test --project=chromium
-```
-
-Firefox:
-
-```bash
 npx playwright test --project=firefox
-```
-
-WebKit:
-
-```bash
 npx playwright test --project=webkit
 ```
 
----
-
-## Debugging Tests
-
-Run in debug mode:
+## Debugging
 
 ```bash
 npx playwright test --debug
-```
-
-Use Playwright Inspector:
-
-```bash
 PWDEBUG=1 npx playwright test
-```
-
-Run a single test:
-
-```bash
 npx playwright test -g "Test Name"
 ```
 
----
-
-## Test Reports
-
-Generate and open the HTML report:
+## Reports
 
 ```bash
 npx playwright show-report
@@ -150,32 +79,6 @@ Report location:
 ```text
 playwright-report/
 ```
-
----
-
-## Trace Viewer
-
-Run tests with tracing enabled:
-
-```bash
-npx playwright test --trace on
-```
-
-Open trace:
-
-```bash
-npx playwright show-trace trace.zip
-```
-
-Usage:
-
-```ts
-import { config } from "../utils/config";
-
-await page.goto(config.baseURL);
-```
-
----
 
 ## Useful Commands
 
@@ -188,6 +91,62 @@ await page.goto(config.baseURL);
 | `npx playwright codegen`       | Generate Playwright code |
 | `npx playwright install`       | Install browsers         |
 
-## License
+## Framework Architecture
 
-This project is intended for internal automation testing purposes.
+The framework follows a layered architecture to improve maintainability, reusability, and scalability.
+
+```text
+tests/
+├── ui/                     # UI test scenarios
+├── api/                    # API test scenarios
+│
+pages/                      # Page Object Models
+├── LoginPage.ts
+├── DashboardPage.ts
+├── PIMPage.ts
+│
+api/                        # API clients/services
+├── EmployeeApi.ts
+│
+fixtures/                   # Shared test fixtures
+├── test-fixtures.ts
+│
+utils/                      # Reusable utilities
+├── randomData.ts
+├── config.ts
+├── test-data.ts
+│
+│
+config/                     # Environment configuration
+├── env.ts
+│
+.github/workflows/          # GitHub Actions CI/CD
+├── playwright.yml
+```
+
+### Design Principles
+
+- **Page Object Model (POM)** for UI interactions
+- **API Service Layer** for API requests and validations
+- **Reusable Utilities** for common actions and assertions
+- **Fixtures** for shared setup and authentication
+- **Data-Driven Testing** using external test data
+- **CI/CD Integration** with GitHub Actions
+- **Hybrid UI + API Validation** for end-to-end verification
+
+### Test Flow
+
+```text
+Test
+ ├─ Fixture Setup
+ ├─ Page Object / API Service
+ ├─ Assertions
+ └─ Report Generation
+
+GitHub Actions
+ ├─ UI Tests
+ ├─ API Tests
+ ├─ Merge Reports
+ ├─ Generate Summary
+ └─ Email Notification
+```
