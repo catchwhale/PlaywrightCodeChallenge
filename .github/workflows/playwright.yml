@@ -284,8 +284,8 @@ jobs:
 
             fs.writeFileSync('summary.txt', summary);
 
-            console.log(summary);
-            EOF
+          console.log(summary);
+          EOF
 
       - name: Compress Results
         continue-on-error: true
