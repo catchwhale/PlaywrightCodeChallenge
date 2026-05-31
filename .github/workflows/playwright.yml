@@ -135,13 +135,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-json
-          path: ui-results.json
+          path: test-results
 
       - name: Download API JSON
         uses: actions/download-artifact@v4
         with:
           name: api-json
-          path: api-results.json
+          path: test-results
 
       - name: Merge Reports (Single HTML)
         run: npx playwright merge-reports --reporter html merged
@@ -151,6 +151,41 @@ jobs:
         with:
           name: merged-playwright-report
           path: playwright-report
+
+      - name: Merge UI + API Results
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+
+          const uiFile = 'test-results/ui-results.json';
+          const apiFile = 'test-results/api-results.json';
+
+          function load(file) {
+            if (!fs.existsSync(file)) return null;
+            return JSON.parse(fs.readFileSync(file, 'utf8'));
+          }
+
+          const ui = load(uiFile);
+          const api = load(apiFile);
+
+          const merged = {
+            summary: {
+              ui: ui ? ui.stats : null,
+              api: api ? api.stats : null
+            },
+            suites: [
+              ...(ui?.suites || []),
+              ...(api?.suites || [])
+            ]
+          };
+
+          fs.writeFileSync(
+            'results/combined-results.json',
+            JSON.stringify(merged, null, 2)
+          );
+
+          console.log('Merged JSON created successfully');
+          EOF
 
       - name: Generate HTML Email Dashboard
         run: |
@@ -199,8 +234,8 @@ jobs:
           const fs = require('fs');
 
           const files = [
-            'reports/ui-results.json',
-            'reports/api-results.json'
+            'test-results/ui-results.json',
+            'test-results/api-results.json'
           ];
 
           let total = 0;
