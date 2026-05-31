@@ -26,13 +26,13 @@ test.describe('OrangeHRM Navigation Menu', () => {
       });
     }
   });
-  test.only('@ui [4]Verify user can navigate to PIM module', async ({ page }) => {
+  test('@ui [4]Verify user can navigate to PIM module', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
 
     await test.step('Navigate to OrangeHRM application', async () => {
       await loginPage.gotoURL('/');
-      await loginPage.verifysubURL('/dashboard');
+      await loginPage.verifysubURL('/web/index.php/dashboard/index');
     });
 
     await test.step('Navigate to PIM module', async () => {
