@@ -1,6 +1,6 @@
 import { test, expect, request } from '@playwright/test';
 
-test('Verify to fetch the employee list using OrangeHRM API call @api', async () => {
+test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 
   // Load saved login session
   const apiContext = await request.newContext({
@@ -44,7 +44,7 @@ test('Verify to fetch the employee list using OrangeHRM API call @api', async ()
 });
 
 
-test('Verify search for the employee created in UI using Employee ID @api', async () => {
+test('@api [2]Verify search for the employee created in UI using Employee ID', async () => {
 
   // Reuse authenticated session
   const apiContext = await request.newContext({
@@ -82,7 +82,7 @@ test('Verify search for the employee created in UI using Employee ID @api', asyn
 });
 
 
-test('Verify to validate UI data matches API response (Employee details consistency) @api @e2e', async ({ page }) => {
+test('@api [3]Validate that UI data matches API response (name, job title, employee ID)', async ({ page }) => {
 
   // API context with session
   const apiContext = await request.newContext({

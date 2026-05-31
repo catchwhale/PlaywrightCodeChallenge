@@ -1,6 +1,6 @@
 import { test, expect } from '../../fixtures/test-fixtures';
 
-test('Get employee by ID using API service layer @api', async ({ employeeAPI }) => {
+test('@api [2]Search for the employee created in UI using Employee ID', async ({ employeeAPI }) => {
 
   const employeeId = '0001';
 
