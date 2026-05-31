@@ -317,21 +317,35 @@ jobs:
 
             <div class="grid">
 
-              <div class="card">
-                <h3>Failed Tests</h3>
-                <ul>
-                  ${failedTests.map(t => `<li>${t}</li>`).join('')}
-                </ul>
-              </div>
+            <div class="card">
+              <h3>Failed Tests</h3>
+              <ul>
+                ${failedTests.map(t => `
+                  <li>
+                    ${t.title} (Retries: ${t.retries})
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
 
               <div class="card">
                 <h3>Flaky Tests</h3>
                 <ul>
-                  ${flakyTests.map(t => `<li>${t}</li>`).join('')}
+                  ${flakyTests.map(t => `
+                    <li>
+                      ${t.title} (Retries: ${t.retries})
+                    </li>
+                  `).join('')}
                 </ul>
               </div>
-
-            </div>
+              
+              <ul>
+                ${
+                  failedTests.length
+                    ? failedTests.map(t => `<li>${t.title} (${t.retries} retries)</li>`).join('')
+                    : '<li>None</li>'
+                }
+              </ul>
 
             <script>
             const ctx = document.getElementById('pieChart');
