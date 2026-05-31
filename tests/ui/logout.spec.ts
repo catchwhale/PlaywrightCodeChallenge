@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
-import { DashboardPage } from '../../pages/DashboardPage';
 
 test.describe('@ui Logout Tests - OrangeHRM', () => {
-  test('@ui [8]Verify can Logout from the application', async ({ page }) => {
+  test('@ui [8] Verify can Logout from the application', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await test.step('Login to application', async () => {

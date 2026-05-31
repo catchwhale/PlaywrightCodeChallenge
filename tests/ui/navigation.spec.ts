@@ -3,7 +3,7 @@ import { LoginPage } from '../../pages/LoginPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 
 test.describe('OrangeHRM Navigation Menu', () => {
-  test('@ui [3]Verify all left navigation menus are visible and functional', async ({ page }) => {
+  test('@ui [3] Verify all left navigation menus are visible and functional', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
@@ -26,7 +26,7 @@ test.describe('OrangeHRM Navigation Menu', () => {
       });
     }
   });
-  test('@ui [4]Verify user can navigate to PIM module', async ({ page }) => {
+  test('@ui [4] Verify user can navigate to PIM module', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
 

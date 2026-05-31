@@ -28,12 +28,8 @@ test.describe('PIM Module Tests', () => {
     });
   });
 
-  test('@ui [5]Verify to add a new employee and capture Employee ID', async ({ page }) => {
+  test('@ui [5 ]Verify to add a new employee and capture Employee ID', async ({ page }) => {
     
-    // const pimPage = new PIMPage(page);
-    // const { firstName, lastName } = generateEmployeeName();
-    // let employeeId: string;
-
     await test.step('Add new employee', async () => {
       await pimPage.clickAddEmployee();
       employeeId = await pimPage.addEmployee(firstName, lastName);
@@ -46,13 +42,12 @@ test.describe('PIM Module Tests', () => {
   });
 
 
-test('@ui [6]Validate employee appears in employee list with correct details', async ({ page }) => {
+test('@ui [6] Validate employee appears in employee list with correct details', async ({ page }) => {
 
 
      await test.step('Add new employee', async () => {
       await pimPage.clickAddEmployee();
       employeeId = await pimPage.addEmployee(firstName, lastName);
-    //   console.log('Captured Employee ID:', employeeId);
     });
 
     

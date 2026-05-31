@@ -1,6 +1,7 @@
 import { test, expect, request } from '@playwright/test';
 import { generateEmployeeName } from '../../utils/randomData';
 import { PIMPage } from '../../pages/PIMPage';
+import { env } from '../..//config/env';
 
 test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 
@@ -11,7 +12,7 @@ test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 
   // 📡 API request
   const response = await apiContext.get(
-    'https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/pim/employees?limit=50&offset=0&model=detailed&includeEmployees=onlyCurrent&sortField=employee.firstName&sortOrder=ASC'
+    `${env.baseURL}/web/index.php/api/v2/pim/employees?limit=50&offset=0&model=detailed&includeEmployees=onlyCurrent&sortField=employee.firstName&sortOrder=ASC`
   );
 
   // 1. Status validation (basic but required)
@@ -46,7 +47,7 @@ test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
 });
 
 
-test('@api [2]Verify search for the employee created in UI using Employee ID', async ({ page }) => {
+test('@api [2] Verify search for the employee created in UI using Employee ID', async ({ page }) => {
 
   // Reuse authenticated session
   const apiContext = await request.newContext({
@@ -60,12 +61,10 @@ test('@api [2]Verify search for the employee created in UI using Employee ID', a
   const lastName = employee.lastName;
 
   const employeeId = await pimPage.addEmployee(firstName, lastName);
-  // Replace this with actual Employee ID from UI creation test
-  // const employeeId = '0001';
 
   // 📡 API request (search employee)
   const response = await apiContext.get(
-    `https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/pim/employees/${employeeId}`
+    `${env.baseURL}/web/index.php/api/v2/pim/employees/${employeeId}`
   );
 
   // 1. Status check
@@ -91,7 +90,7 @@ test('@api [2]Verify search for the employee created in UI using Employee ID', a
 });
 
 
-test('@api [3]Validate that UI data matches API response (name, job title, employee ID)', async ({ page }) => {
+test('@api [3] Validate that UI data matches API response (name, job title, employee ID)', async ({ page }) => {
 
   // API context with session
   const apiContext = await request.newContext({
@@ -111,7 +110,7 @@ test('@api [3]Validate that UI data matches API response (name, job title, emplo
   // STEP 1: GET DATA FROM API
   // =========================
   const apiResponse = await apiContext.get(
-    `https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/pim/employees/${employeeId}`
+    `${env.baseURL}/web/index.php/api/v2/pim/employees/${employeeId}`
   );
 
   expect(apiResponse.status()).toBe(200);
@@ -124,7 +123,7 @@ test('@api [3]Validate that UI data matches API response (name, job title, emplo
   // =========================
   // STEP 2: GET DATA FROM UI
   // =========================
-  await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/pim/viewEmployeeList');
+  await page.goto(`${env.baseURL}/web/index.php/pim/viewEmployeeList`);
 
   // Search employee
   await page.fill('input[placeholder="Search"]', employeeId);

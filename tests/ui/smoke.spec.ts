@@ -2,7 +2,7 @@ import { test, expect } from '../../fixtures/test-fixtures';
 
 test.describe('@ui Smoke Tests - OrangeHRM', () => {
 
-  test('@ui [1]Verify can navigate to OrangeHRM application', async ({ loginPage }) => {
+  test('@ui [1] Verify can navigate to OrangeHRM application', async ({ loginPage }) => {
     await loginPage.gotoURL('/');
     await loginPage.logout();
     await test.step('Navigate to OrangeHRM URL', async () => {

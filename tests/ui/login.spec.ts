@@ -6,24 +6,23 @@ import { testData } from '../../utils/test-data';
 // test.use({ storageState: undefined });
 test.describe('Login Tests', () => {
 
-  test('@ui [1]Verify can navigate to the OrangeHRM application', async ({ loginPage }) => {
+  test('@ui [1] Verify can navigate to the OrangeHRM application', async ({ loginPage }) => {
 
       await loginPage.prepareForLogin();
       await loginPage.gotoURL('/');
       await loginPage.verifysubURL('/web/index.php/auth/login');
-      // console.log("Hello")
   });
 
 
-  // test('@ui [2]Verify user login to the application using provided admin credentials', async ({ loginPage }) => {
-      // await loginPage.prepareForLogin();
+  test('@ui [2] Verify user login to the application using provided admin credentials', async ({ loginPage }) => {
+      await loginPage.prepareForLogin();
       
-      // await loginPage.login(
-      //   testData.login.username,
-      //   testData.login.password
-      // );
+      await loginPage.login(
+        testData.login.username,
+        testData.login.password
+      );
 
-      // await loginPage.verifysubURL('/web/index.php/dashboard/index');
-  // });
+      await loginPage.verifysubURL('/web/index.php/dashboard/index');
+  });
 
 });
