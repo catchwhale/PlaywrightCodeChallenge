@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test && npm run zip-report",
-    "zip-report": "ts-node scripts/zip-report.ts"
+    "zip-report": "ts-node scripts/zip-report.ts",
+    "knip": "knip"
   },
   "keywords": [],
   "author": "",
@@ -12,7 +13,9 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.1",
+    "knip": "^5.88.1",
     "prettier": "^3.8.3",
+    "ts-prune": "^0.10.3",
     "typescript": "^6.0.3"
   },
   "directories": {
