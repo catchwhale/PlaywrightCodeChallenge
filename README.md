@@ -107,9 +107,15 @@ pages/                      # Page Object Models
 │
 api/                        # API clients/services
 ├── EmployeeApi.ts
+|
+constant/                        # Constant data 
+├── menuData.ts
 │
 fixtures/                   # Shared test fixtures
 ├── test-fixtures.ts
+|
+services/                        # API clients/services
+├── EmployeeApi.ts
 │
 utils/                      # Reusable utilities
 ├── randomData.ts
