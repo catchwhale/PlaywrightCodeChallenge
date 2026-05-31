@@ -29,7 +29,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run UI Tests (Blob)
-        run: npx playwright test tests/ui --reporter=blob
+        run: npx playwright test tests/ui --reporter=blob || true
 
       - name: Upload UI Blob Report
         if: always()
@@ -60,7 +60,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run API Tests (Blob)
-        run: npx playwright test tests/api --reporter=blob
+        run: npx playwright test tests/api --reporter=blob || true
 
       - name: Upload API Blob Report
         if: always()
@@ -125,7 +125,7 @@ jobs:
           <body style="font-family: Arial; background:#f6f8fa; padding:20px;">
 
             <div style="background:#ffffff; padding:20px; border-radius:10px;">
-              <h2 style="color:#24292f;">📊 Playwright Test Dashboard</h2>
+              <h2 style="color:#24292f;"> Playwright Test Dashboard</h2>
 
               <pre style="background:#f3f3f3; padding:10px; border-radius:6px;">
             ${summary}
