@@ -10,7 +10,7 @@ test.describe('OrangeHRM Navigation Menu', () => {
 
     await test.step('Login to OrangeHRM', async () => {
       await loginPage.gotoURL('/');
-      await expect(page).toHaveURL(/dashboard/i);
+      await loginPage.verifysubURL('/web/index.php/dashboard/index');
     });
 
     for (const menu of dashboardPage.menus) {

@@ -10,18 +10,14 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "D:/playwright-project/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "",
         "name": "",
         "testDir": "D:/playwright-project/tests",
@@ -64,81 +60,24 @@
     "workers": 1,
     "webServer": null
   },
-  "suites": [
-    {
-      "title": "ui\\logout.spec.ts",
-      "file": "ui/logout.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "@ui Logout Tests - OrangeHRM",
-          "file": "ui/logout.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "@ui [8]Verify can Logout from the application",
-              "ok": true,
-              "tags": [
-                "ui",
-                "ui"
-              ],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "steps": [
-                        {
-                          "title": "Login to application",
-                          "duration": -1
-                        }
-                      ],
-                      "startTime": "2026-05-31T14:10:44.959Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "623cebb733135aff17bd-233f7bc1e97ae8d0a2e7",
-              "file": "ui/logout.spec.ts",
-              "line": 6,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "suites": [],
   "errors": [
     {
-      "message": "\u001b[31mTimed out waiting 50s for the test suite to run\u001b[39m"
-    },
-    {
-      "message": "\u001b[31mTimed out waiting 50s for the teardown for test suite to run\u001b[39m"
+      "message": "TimeoutError: page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://opensource-demo.orangehrmlive.com/\", waiting until \"load\"\u001b[22m\n",
+      "stack": "TimeoutError: page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://opensource-demo.orangehrmlive.com/\", waiting until \"load\"\u001b[22m\n\n    at LoginPage.gotoURL (D:\\playwright-project\\pages\\LoginPage.ts:7:21)\n    at login (D:\\playwright-project\\utils\\auth.ts:10:21)\n    at globalSetup (D:\\playwright-project\\global-setup.ts:5:3)",
+      "location": {
+        "file": "D:\\playwright-project\\pages\\LoginPage.ts",
+        "column": 21,
+        "line": 7
+      },
+      "snippet": "\u001b[90m   at \u001b[39m..\\pages\\LoginPage.ts:7\n\n\u001b[0m \u001b[90m  5 |\u001b[39m\n \u001b[90m  6 |\u001b[39m   \u001b[36masync\u001b[39m gotoURL(url\u001b[33m:\u001b[39m string) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  7 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgoto(url)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  8 |\u001b[39m   }\n \u001b[90m  9 |\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36masync\u001b[39m login(username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m password\u001b[33m:\u001b[39m string) {\u001b[0m"
     }
   ],
   "stats": {
-    "startTime": "2026-05-31T14:10:08.321Z",
-    "duration": 50022.506,
+    "startTime": "2026-05-31T14:31:38.385Z",
+    "duration": 33868.176,
     "expected": 0,
-    "skipped": 1,
+    "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   }
