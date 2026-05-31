@@ -1,0 +1,84 @@
+{
+  "config": {
+    "configFile": "D:\\playwright-project\\playwright.config.ts",
+    "rootDir": "D:/playwright-project/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "D:\\playwright-project\\auth\\auth.setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/playwright-project/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "",
+        "name": "",
+        "testDir": "D:/playwright-project/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "blob",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: expect(page).toHaveURL(expected) failed\n\nExpected pattern: /dashboard/\nReceived string:  \"\"\nTimeout: 5000ms\n\nCall log:\n  - Expect \"to.have.url\" with timeout 5000ms\n",
+      "stack": "Error: expect(page).toHaveURL(expected) failed\n\nExpected pattern: /dashboard/\nReceived string:  \"\"\nTimeout: 5000ms\n\nCall log:\n  - Expect \"to.have.url\" with timeout 5000ms\n\n    at globalSetup (D:\\playwright-project\\auth\\auth.setup.ts:14:22)",
+      "location": {
+        "file": "D:\\playwright-project\\auth\\auth.setup.ts",
+        "column": 22,
+        "line": 14
+      },
+      "snippet": "\u001b[90m   at \u001b[39m..\\auth\\auth.setup.ts:14\n\n\u001b[0m \u001b[90m 12 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 13 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mcontext()\u001b[33m.\u001b[39mstorageState({ path\u001b[33m:\u001b[39m \u001b[32m'storageState.json'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m\u001b[0m"
+    }
+  ],
+  "stats": {
+    "startTime": "2026-05-31T11:44:35.006Z",
+    "duration": 29562.818000000003,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
