@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 import { env } from './config/env';
 import { chromium } from '@playwright/test';
+import { PATHS } from './config/paths';
 
 export default defineConfig({
     testDir: './tests',
@@ -12,7 +13,7 @@ export default defineConfig({
     fullyParallel: false, // enables parallel per file
     workers: 1,
     retries: 1,
-    globalSetup: './global-setup',
+    globalSetup: './global-setup.ts',
     use: {
         baseURL: env.baseURL,
         actionTimeout: 30 * 1000,
@@ -21,7 +22,7 @@ export default defineConfig({
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         trace: 'retain-on-failure',
-        storageState: 'playwright/.auth/storageState.json',
+        storageState: PATHS.storageState,
         
     },
     reporter: [

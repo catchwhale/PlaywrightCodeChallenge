@@ -9,6 +9,6 @@ export const MENU_ITEMS = [
     { name: 'Dashboard', url: '/dashboard/' },
     { name: 'Directory', url: '/directory/' },
     { name: 'Claim', url: '/claim/' },
-    { name: 'Buzz', url: '/buzz/' },
-    { name: 'Maintenance', url: '/maintenance/' }
+    { name: 'Buzz', url: '/buzz/' }
+    // { name: 'Maintenance', url: '/maintenance/' }
   ];
