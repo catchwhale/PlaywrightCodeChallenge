@@ -1,4 +1,5 @@
-import { chromium } from '@playwright/test';
+const { chromium } = require('@playwright/test');
+const fs = require('fs');
 import { login } from './utils/auth';
 
 async function globalSetup() {
@@ -18,3 +19,4 @@ async function globalSetup() {
 }
 
 export default globalSetup;
+

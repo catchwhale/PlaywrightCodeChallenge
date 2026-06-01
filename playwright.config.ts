@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 import { env } from './config/env';
+import { chromium } from '@playwright/test';
 
 export default defineConfig({
     testDir: './tests',

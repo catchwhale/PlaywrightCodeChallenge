@@ -8,7 +8,7 @@ on:
 jobs:
   auth-setup:
     name: Generate Authentication Storage State
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:
       - name: Checkout Repository
@@ -302,6 +302,6 @@ jobs:
           subject: Playwright Test Report - Run
           to: mr_joe8888@yahoo.com
           from: CI Bot Automation <${{ secrets.GMAIL_USERNAME }}>
-          html_body: file://playwright-dashboard.html
+          html_body: $(cat playwright-dashboard.html)
           attachments: |
             playwright-dashboard.html

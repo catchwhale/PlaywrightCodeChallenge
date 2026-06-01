@@ -1,4 +1,5 @@
-import { chromium, expect } from '@playwright/test';
+const { chromium } = require('@playwright/test');
+const fs = require('fs');
 import { env } from '../config/env';
 import { LoginPage } from '../pages/LoginPage';
 
