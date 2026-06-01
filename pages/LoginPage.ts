@@ -19,6 +19,11 @@ export class LoginPage {
     
   }
 
+  async gotoDashboard() {
+    await this.gotoURL('/');
+    await this.verifysubURL('/web/index.php/dashboard/index');
+  }
+
   async prepareForLogin() {
     await this.page.goto('/web/index.php/auth/login');
     try {

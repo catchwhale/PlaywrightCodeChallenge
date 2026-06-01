@@ -9,8 +9,7 @@ test.describe('OrangeHRM Navigation Menu', () => {
     const dashboardPage = new DashboardPage(page);
 
     await test.step('Login to OrangeHRM', async () => {
-      await loginPage.gotoURL('/');
-      await loginPage.verifysubURL('/web/index.php/dashboard/index');
+    await loginPage.gotoDashboard();
     });
 
     for (const menu of dashboardPage.menus) {
@@ -31,8 +30,7 @@ test.describe('OrangeHRM Navigation Menu', () => {
     const dashboardPage = new DashboardPage(page);
 
     await test.step('Navigate to OrangeHRM application', async () => {
-      await loginPage.gotoURL('/');
-      await loginPage.verifysubURL('/web/index.php/dashboard/index');
+      await loginPage.gotoDashboard();
     });
 
     await test.step('Navigate to PIM module', async () => {

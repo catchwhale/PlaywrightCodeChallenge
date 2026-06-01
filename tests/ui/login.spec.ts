@@ -6,8 +6,7 @@ test.describe('Login Tests', () => {
   test('@ui [1] Verify can navigate to the OrangeHRM application', async ({ loginPage }) => {
 
       await loginPage.prepareForLogin();
-      await loginPage.gotoURL('/');
-      await loginPage.verifysubURL('/web/index.php/auth/login');
+      await loginPage.gotoDashboard();
   });
 
 
