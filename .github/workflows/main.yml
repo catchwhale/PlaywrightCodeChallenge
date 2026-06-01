@@ -1,8 +1,8 @@
 name: Playwright Pipeline
-'on':
+"on":
   push:
     branches:
-      - main
+      - dev
 jobs:
   auth-setup:
     name: Generate Authentication Storage State
