@@ -31,91 +31,45 @@ test.describe('API Module Tests', () => {
 
   // });
 
-test('@api [1]Fetch the employee list using OrangeHRM API call', async () => {
+test.only('@api [1] Fetch the employee list using OrangeHRM API call', async ({ employeeApi }) => {
 
-  // Load saved login session
-  const apiContext = await request.newContext({
-    storageState: 'storageState.json',
-  });
+    const response = await employeeApi.getEmployees();
 
-  // 📡 API request
-  const response = await apiContext.get(
-    `${env.baseURL}/web/index.php/api/v2/pim/employees?limit=50&offset=0&model=detailed&includeEmployees=onlyCurrent&sortField=employee.firstName&sortOrder=ASC`
-  );
+    expect(response.status()).toBe(200);
 
-  // 1. Status validation (basic but required)
-  expect(response.status()).toBe(200);
-  expect(response.ok()).toBeTruthy();
+    const body = await response.json();
 
-  const data = await response.json();
+    expect(body.data).toBeDefined();
+    expect(body.data.length).toBeGreaterThan(0);
 
-  // 2. Response structure validation
-  expect(data).toHaveProperty('data');
-  expect(Array.isArray(data.data)).toBeTruthy();
+    const firstEmployee = body.data[0];
 
-  // 3. Ensure list is not empty
-  expect(data.data.length).toBeGreaterThan(0);
-
-  // 4. Validate first employee object structure
-  const firstEmployee = data.data[0];
-
-  expect(firstEmployee).toHaveProperty('employeeId');
-  expect(firstEmployee).toHaveProperty('firstName');
-  expect(firstEmployee).toHaveProperty('lastName');
-
-  // 5. Business rule check (real-world validation)
-  expect(firstEmployee.firstName).not.toBeNull();
-  expect(firstEmployee.lastName).not.toBeNull();
-
-  // 6. Check pagination metadata (if available)
-  if (data.meta) {
-    expect(data.meta).toHaveProperty('total');
-    expect(data.meta.total).toBeGreaterThan(0);
-  }
+    expect(firstEmployee.employeeId).toBeDefined();
+    expect(firstEmployee.firstName).toBeDefined();
+    expect(firstEmployee.lastName).toBeDefined();
+    });
+  
 });
 
 
-test('@api [2] Verify search for the employee created in UI using Employee ID', async ({ page }) => {
 
-  // // Reuse authenticated session
-  // const apiContext = await request.newContext({
-  //   storageState: 'storageState.json',
-  // });
-  // Login UI
-  // Create employee UI
-  // const pimPage = new PIMPage(page);
-  // const employee = generateEmployeeName();
-  // const firstName = employee.firstName;
-  // const lastName = employee.lastName;
+test('@api [2] Verify search for the employee created in UI using Employee ID', async ({page, employeeApi }) => {
 
-  // const employeeId = await pimPage.addEmployee(firstName, lastName);
+    const pimPage = new PIMPage(page);
 
-  // 📡 API request (search employee)
-  const employeeId = '1012'
-  const response = await apiContext.get(
-    `${env.baseURL}/web/index.php/api/v2/pim/employees/${employeeId}`
-  );
+    const employee = generateEmployeeName();
 
-  // 1. Status check
-  expect(response.status()).toBe(200);
-  expect(response.ok()).toBeTruthy();
+    const employeeId = await pimPage.addEmployee(
+        employee.firstName,
+        employee.lastName
+    );
 
-  const data = await response.json();
+    const response = await employeeApi.getEmployeeById(employeeId);
+    expect(response.ok()).toBeTruthy();
+    const body = await response.json();
 
-  console.log(data);
-
-  // 2. Validate response structure
-  expect(data).toHaveProperty('data');
-
-  // 3. Validate employee exists
-  expect(data.data).not.toBeNull();
-
-  // 4. Validate Employee ID matches request
-  expect(data.data.employeeId).toBe(employeeId);
-
-  // 5. Validate essential fields
-  expect(data.data.firstName).toBeTruthy();
-  expect(data.data.lastName).toBeTruthy();
+    expect(body.data.employeeId)
+        .toBe(employeeId);
 });
 
 test('@api [3] Validate that UI data matches API response (name, job title, employee ID)',

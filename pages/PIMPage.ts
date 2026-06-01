@@ -6,8 +6,11 @@ export class PIMPage {
   async clickAddEmployee() {
     await this.page.getByRole('button', { name: 'Add' }).click();
   }
-
+  async clickSaveEmployee() {
+     await this.page.getByRole('button', { name: 'Save' }).click();
+  }
   async addEmployee(firstName: string, lastName: string) {
+    await this.clickAddEmployee();
     await this.page.getByPlaceholder('First Name').fill(firstName);
     await this.page.getByPlaceholder('Last Name').fill(lastName);
 
@@ -17,8 +20,7 @@ export class PIMPage {
     ).first();
 
     const employeeId = await employeeIdInput.inputValue();
-
-    await this.page.getByRole('button', { name: 'Save' }).click();
+    await this.clickSaveEmployee();
 
     return employeeId;
   }

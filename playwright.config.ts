@@ -11,12 +11,12 @@ export default defineConfig({
     fullyParallel: false, // enables parallel per file
     workers: 1,
     retries: 1,
-    globalSetup: require.resolve('./global-setup'),
+    globalSetup: './global-setup',
     use: {
         baseURL: env.baseURL,
         actionTimeout: 30 * 1000,
         navigationTimeout: 120 * 1000,
-        headless: true,
+        headless: false,
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         trace: 'retain-on-failure',
