@@ -8,3 +8,4 @@ node_modules/
 /playwright/.auth/
 storageState.json
 test-results.json
+.auth/storageState.json
