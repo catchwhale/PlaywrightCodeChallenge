@@ -37,13 +37,11 @@ test.describe('OrangeHRM Navigation Menu', () => {
 
     await test.step('Navigate to PIM module', async () => {
       await dashboardPage.navigateToPIM();
-      await loginPage.verifysubURL('/pin');
+      await loginPage.verifysubURL('/web/index.php/pim/viewEmployeeList');
     });
 
-    await test.step('Verify PIM page is displayed', async () => {
-      await expect(
-        page.getByRole('heading', { name: 'PIM' })
-      ).toBeVisible();
+   await expect(
+    page.locator('.oxd-topbar-header-breadcrumb-module')
+  ).toHaveText('PIM')
     });
-  });
 });
