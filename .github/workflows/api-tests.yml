@@ -28,11 +28,44 @@ jobs:
           name: storage-state
           path: playwright/.auth/storageState.json
 
-      - name: Verify Storage State Artifact exists
-        if: always()
+      - name: Verify storage state file
+        shell: bash
         run: |
-          ls -la
-          test -f playwright/.auth/storageState.json
+          FILE="playwright/.auth/storageState.json"
+
+          # Check file exists
+          if [ ! -f "$FILE" ]; then
+            echo "Storage state file not found: $FILE!"
+            exit 1
+          fi
+
+          # Check file is not empty
+          if [ ! -s "$FILE" ]; then
+            echo "Storage state file is empty!"
+            exit 1
+          fi
+
+          # Validate JSON structure
+          jq -e '
+            has("cookies") and
+            has("origins")
+          ' "$FILE" > /dev/null || {
+            echo "Invalid storage state structure"
+            exit 1
+          }
+
+          # Ensure authentication data exists
+          COOKIE_COUNT=$(jq '.cookies | length' "$FILE")
+          ORIGIN_COUNT=$(jq '.origins | length' "$FILE")
+
+          if [ "$COOKIE_COUNT" -eq 0 ] && [ "$ORIGIN_COUNT" -eq 0 ]; then
+            echo "Storage state contains no authentication data"
+            exit 1
+          fi
+
+          echo "Storage state validation passed"
+          echo "Cookies: $COOKIE_COUNT"
+          echo "Origins: $ORIGIN_COUNT"
 
       - name: Run API Tests (Blob)
         continue-on-error: true
