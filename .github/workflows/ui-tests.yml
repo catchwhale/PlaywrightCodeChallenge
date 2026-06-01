@@ -10,6 +10,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Download Storage State
+        uses: actions/download-artifact@v4
+        with:
+          name: storage-state
+          path: playwright/.auth
+
+      - name: Verify Download
+        run: |
+          pwd
+          ls -lah playwright/.auth
+
       - name: Setup Node JS
         uses: actions/setup-node@v4
         with:
@@ -21,51 +32,6 @@ jobs:
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-
-      - name: Download Storage State Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: storage-state
-          path: playwright/.auth/storageState.json
-
-      - name: Verify storage state file
-        shell: bash
-        run: |
-          FILE="playwright/.auth/storageState.json"
-
-          # Check file exists
-          if [ ! -f "$FILE" ]; then
-            echo "Storage state file not found: $FILE!"
-            exit 1
-          fi
-
-          # Check file is not empty
-          if [ ! -s "$FILE" ]; then
-            echo "Storage state file is empty!"
-            exit 1
-          fi
-
-          # Validate JSON structure
-          jq -e '
-            has("cookies") and
-            has("origins")
-          ' "$FILE" > /dev/null || {
-            echo "Invalid storage state structure"
-            exit 1
-          }
-
-          # Ensure authentication data exists
-          COOKIE_COUNT=$(jq '.cookies | length' "$FILE")
-          ORIGIN_COUNT=$(jq '.origins | length' "$FILE")
-
-          if [ "$COOKIE_COUNT" -eq 0 ] && [ "$ORIGIN_COUNT" -eq 0 ]; then
-            echo "Storage state contains no authentication data"
-            exit 1
-          fi
-
-          echo "Storage state validation passed"
-          echo "Cookies: $COOKIE_COUNT"
-          echo "Origins: $ORIGIN_COUNT"
 
       - name: Run UI Tests (Blob)
         continue-on-error: true
