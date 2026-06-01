@@ -1,5 +1,5 @@
-name: Playwright Pipeline
-on:
+name: Playwright Tests
+"on":
   push:
     branches:
       - dev
@@ -123,19 +123,10 @@ jobs:
 
           const fs = require('fs');
 
-
-          const FILES = [
-
-          'results/ui-results.json',
-
-          'results/api-results.json'
-
+          const FILES = [ 'results/ui-results.json', 'results/api-results.json'
           ];
 
-
-          const loadJson = (file) => {
-
-          try {
+          const loadJson = (file) => { try {
             return fs.existsSync(file)
               ? JSON.parse(fs.readFileSync(file, 'utf8'))
               : null;
@@ -145,40 +136,26 @@ jobs:
 
           };
 
-
-          const flattenTests = (suite, collector = []) => {
-
-          for (const spec of suite?.specs ?? []) {
+          const flattenTests = (suite, collector = []) => { for (const spec of
+          suite?.specs ?? []) {
             for (const test of spec?.tests ?? []) {
             collector.push(test);
             }
           }
 
-
           for (const child of suite?.suites ?? []) {
             flattenTests(child, collector);
           }
 
+          return collector; };
 
-          return collector;
+          const classifyTest = (test) => { const results = test?.results ?? [];
 
-          };
-
-
-          const classifyTest = (test) => {
-
-          const results = test?.results ?? [];
-
-
-          const hasPassed = results.some(r => r.status === 'passed');
-
-          const hasFailed = results.some(r => r.status === 'failed');
-
-          const retries = Math.max(0, results.length - 1);
-
+          const hasPassed = results.some(r => r.status === 'passed'); const
+          hasFailed = results.some(r => r.status === 'failed'); const retries =
+          Math.max(0, results.length - 1);
 
           const isFlaky = hasPassed && hasFailed;
-
 
           return {
             title: test?.title ?? 'Unknown Test',
@@ -188,27 +165,14 @@ jobs:
 
           };
 
+          let total = 0; let passed = 0; let failed = 0; let flaky = 0;
 
-          let total = 0;
-
-          let passed = 0;
-
-          let failed = 0;
-
-          let flaky = 0;
-
-
-          const failedTests = [];
-
-          const flakyTests = [];
-
+          const failedTests = []; const flakyTests = [];
 
           const reports = FILES.map(loadJson).filter(Boolean);
 
-
-          for (const report of reports) {
-
-          for (const suite of report?.suites ?? []) {
+          for (const report of reports) { for (const suite of report?.suites ??
+          []) {
             const tests = flattenTests(suite);
 
             for (const t of tests) {
@@ -225,15 +189,10 @@ jobs:
               flakyTests.push(result);
             }
             }
-          }
-
-          }
-
+          } }
 
           const runUrl =
-
           `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-
 
           const html = `
 
@@ -255,15 +214,12 @@ jobs:
 
           </head>
 
-
           <body>
-
 
           <div class="card">
             <h2>Playwright Dashboard</h2>
             <p><b>Run:</b> <a href="${runUrl}">${runUrl}</a></p>
           </div>
-
 
           <div class="grid">
             <div class="card">
@@ -279,7 +235,6 @@ jobs:
             <p>Flaky: ${flaky}</p>
             </div>
           </div>
-
 
           <div class="grid">
 
@@ -303,7 +258,6 @@ jobs:
 
           </div>
 
-
           <script>
             new Chart(document.getElementById('pieChart'), {
             type: 'pie',
@@ -316,18 +270,15 @@ jobs:
             });
           </script>
 
-
           </body>
 
           </html>
 
           `;
 
-
           fs.writeFileSync('playwright-dashboard.html', html);
 
           fs.writeFileSync('email.html', html);
-
 
           console.log('Dashboard generated');
 
