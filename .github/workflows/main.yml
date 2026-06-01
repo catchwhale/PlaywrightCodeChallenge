@@ -23,7 +23,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Generate storageState only
-        run: npx ts-node ./global-setup.ts
+        run: npx tsx scripts/generate-storage-state.ts
       - name: Verify Storage State File
         run: >
           ls -la
