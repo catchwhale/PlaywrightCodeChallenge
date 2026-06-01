@@ -7,50 +7,49 @@ jobs:
   api-tests:
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-        - name: Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-        - name: Install Dependencies
-            run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-        - name: Install Playwright Browsers
-            run: npx playwright install --with-deps
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
 
-        - name: Run API Tests (Blob)
-            continue-on-error: true
-            run: |
-            npx playwright test tests/api
+      - name: Run API Tests (Blob)
+        continue-on-error: true
+        run: npx playwright test tests/api
 
-        - name: Prepare API JSON
-            if: always()
-            run: |
-            ls -la
-            test -f test-results.json
-            cp test-results.json api-results.json
+      - name: Prepare API JSON
+        if: always()
+        run: |
+          ls -la
+          test -f test-results.json
+          cp test-results.json api-results.json
 
-        - name: Verify API JSON Exists
-            if: always()
-            run: |
-            ls -la
-            test -f test-results.json
-            cp test-results.json api-results.json
+      - name: Verify API JSON Exists
+        if: always()
+        run: |
+          ls -la
+          test -f test-results.json
+          cp test-results.json api-results.json
 
-        - name: Upload API Blob Report
-            if: always()
-            uses: actions/upload-artifact@v4
-            with:
-            name: api-blob
-            path: blob-report
+      - name: Upload API Blob Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-blob
+          path: blob-report
 
-        - name: Upload API JSON Report
-            if: always()
-            uses: actions/upload-artifact@v4
-            with:
-            name: api-json
-            path: api-results.json
+      - name: Upload API JSON Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-json
+          path: api-results.json
