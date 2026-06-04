@@ -19,7 +19,7 @@ test.describe('PIM Module Tests', () => {
     dashboardPage = new DashboardPage(page);
     pimPage = new PIMPage(page);
 
-    const employee = generateEmployeeName();
+    // const employee = generateEmployeeName();
     // firstName = employee.firstName;
     // lastName = employee.lastName;
 
@@ -44,35 +44,31 @@ test.describe('PIM Module Tests', () => {
   });
 
 
-test.only('@ui [6] Validate employee appears in employee list with correct details', async ({ page }) => {
+test('@ui [6] Validate employee appears in employee list with correct details', async ({ page }) => {
 
-    const employee = generateEmployeeName();
-    //  await test.step('Add new employee', async () => {
-    //   await pimPage.clickAddEmployee();
-    //   employeeId = await pimPage.addEmployee(employee.firstName, employee.lastName);
-    // });
-    let employeeId: string;
+  const employee = generateEmployeeName();
+    await test.step('Add new employee', async () => {
+      
+      const employeeId = await pimPage.addEmployee(employee.firstName, employee.lastName);
+      console.log('Captured Employee ID:', employeeId);
     
-    // await test.step('Navigate to PIM and add employee', async () => {
-    //     await pimPage.clickAddEmployee();
-    //     await dashboardPage.navigateToPIM();
-    //     employeeId = await pimPage.addEmployee(employee.firstName, employee.lastName);
-    // });
 
-    // await test.step('Go to Employee List', async () => {
-    //     await pimPage.goToEmployeeList();
-    // });
+      await test.step('Verify employee created', async () => {
+        await pimPage.verifyEmployeeCreated(employee.firstName, employee.lastName);
+      });
+      
+      await test.step('Go to Employee List', async () => {
+          await pimPage.goToEmployeeList();
+      });
 
-    // await test.step('Search employee by ID', async () => {
-    //     await pimPage.searchEmployeeById(employeeId);
-    // });
+      await test.step('Search employee by ID', async () => {
+          await pimPage.searchEmployeeById(employeeId);
+      });
 
-    await test.step('Verify employee details', async () => {
-        employeeId = '0398'
-        await loginPage.gotoURL('/web/index.php/pim/viewEmployeeList')
-        await loginPage.verifysubURL('/web/index.php/pim/viewEmployeeList')
-        await pimPage.verifyEmployeeInList('AI', "Tester", employeeId);
-        await pimPage.verifyEmployeeExists('(1) Record Found')
+      await test.step('Verify employee details', async () => {
+          await pimPage.verifyEmployeeInList(employee.firstName, employee.lastName, employeeId);
+          await pimPage.verifyEmployeeExists('(1) Record Found')
+      });
     });
   });
 });

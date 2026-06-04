@@ -27,23 +27,20 @@ export class PIMPage {
   }
 
   async searchEmployeeById(employeeId: string) {
-    // const input = this.page.locator('input.oxd-input.oxd-input--active');
-    // // await this.page.getByPlaceholder('Type for hints...').first().fill(employeeId);
-    // await input.fill(employeeId);
-    // await this.page.getByLabel('Employee Id').fill(employeeId);
-    await this.page
-  .locator('div.oxd-input-group')
-  .filter({ hasText: 'Employee Id' })
-  .locator('input')
-  .fill('12345');
-    // await this.page.getByRole('button', { name: 'Search' }).click();
+     const employeeIdInput = this.page
+      .locator('.oxd-input-group')
+      .filter({ hasText: 'Employee Id' })
+      .locator('input');
+
+    await employeeIdInput.fill(employeeId);
+    await this.page.getByRole('button', { name: 'Search' }).click();
   }
 
   async verifyEmployeeInList(firstName: string, lastName: string, employeeId: string) {
-    await this.searchEmployeeById(employeeId)
-    // await expect(this.page.getByText(employeeId)).toBeVisible();
-    // await expect(this.page.getByText(firstName)).toBeVisible();
-    // await expect(this.page.getByText(lastName)).toBeVisible();
+    // await this.searchEmployeeById(employeeId)
+    await expect(this.page.getByText(employeeId)).toBeVisible();
+    await expect(this.page.getByText(firstName)).toBeVisible();
+    await expect(this.page.getByText(lastName)).toBeVisible();
   }
 
    async verifyEmployeeExists(text: string) {

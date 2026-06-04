@@ -12,11 +12,11 @@ export default defineConfig({
     },
     fullyParallel: false, // enables parallel per file
     workers: 1,
-    retries: 1,
+    retries: 0,
     globalSetup: './global-setup.ts',
     use: {
         baseURL: env.baseURL,
-        actionTimeout: 30 * 1000,
+        actionTimeout: 60 * 1000,
         navigationTimeout: 120 * 1000,
         headless: false,
         screenshot: 'only-on-failure',
