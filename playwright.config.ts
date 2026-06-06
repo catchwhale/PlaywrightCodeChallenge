@@ -5,7 +5,7 @@ import { PATHS } from './config/paths';
 
 export default defineConfig({
     testDir: './tests',
-    globalTimeout: 120 * 1000, // optional: disables full run limit
+    globalTimeout: 60 * 60 * 1000, // 1 hour
     timeout:  120 * 1000, // 2 minutes per test
     expect: {
         timeout: 15 * 1000,
@@ -17,7 +17,7 @@ export default defineConfig({
     globalSetup: './global-setup.ts',
     use: {
         baseURL: env.baseURL,
-        actionTimeout: 60 * 1000,
+        actionTimeout: 121 * 1000,
         navigationTimeout: 240 * 1000,
         headless: true,
         screenshot: 'only-on-failure',

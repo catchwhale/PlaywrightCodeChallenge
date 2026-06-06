@@ -28,6 +28,11 @@ export class LoginPage {
   async gotoDashboard() {
     await this.gotoURL('/');
     await this.verifysubURL('/web/index.php/dashboard/index');
+    await expect(
+      this.page.locator('.oxd-topbar-header-breadcrumb-module', {
+        hasText: 'Dashboard'
+      })
+    ).toBeVisible();
   }
 
   async prepareForLogin() {

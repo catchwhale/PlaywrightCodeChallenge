@@ -37,8 +37,6 @@ test.describe('API Module Tests', () => {
         });
 
         test('@api [2] Verify search for employee created in UI using Employee ID', async ({ page, employeeApi }) => {
-
-            
             employeeId = await pimPage.addEmployee(
                 employee.firstName,
                 employee.lastName
