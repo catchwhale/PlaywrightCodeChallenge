@@ -35,13 +35,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-blob
-          path: blobs/ui
+          path: blobs
 
       - name: Download API Blob
         uses: actions/download-artifact@v4
         with:
           name: api-blob
-          path: blobs/api
+          path: blobs
 
       - name: Verify Downloaded Artifacts
         run: |
