@@ -34,13 +34,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-blob
-          path: blob-report
+          path: blobs
 
       - name: Download API Blob
         uses: actions/download-artifact@v4
         with:
           name: api-blob
-          path: blob-report
+          path: blobs
+
+      - name: Verify blobs
+        run: ls -R blobs
 
       - name: Merge Playwright Reports
         run: npx playwright merge-reports blobs --reporter html
