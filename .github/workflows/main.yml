@@ -50,48 +50,54 @@ jobs:
 
       - name: Generate JSON Summary Report
         run: npx playwright merge-reports blobs --reporter json > merged-report.json
-
-      - name: Print Test Summary
+      - name: Write GitHub Summary
         run: |
+          echo "## 🎭 Playwright Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- Failed: $FAILED" >> $GITHUB_STEP_SUMMARY
+          echo "- Skipped: $SKIPPED" >> $GITHUB_STEP_SUMMARY
+          echo "- Flaky: $FLAKY" >> $GITHUB_STEP_SUMMARY
+      - name: Print Test Summary
+        run: | 
           node -e "
-          const report = require('./merged-report.json');
+            const report = require('./merged-report.json');
 
-          let passed = 0;
-          let failed = 0;
-          let skipped = 0;
-          let flaky = 0;
+            let passed = 0;
+            let failed = 0;
+            let skipped = 0;
+            let flaky = 0;
 
-          for (const suite of report.suites || []) {
-            for (const spec of suite.specs || []) {
-              for (const test of spec.tests || []) {
-                const results = test.results || [];
+            for (const suite of report.suites || []) {
+              for (const spec of suite.specs || []) {
+                for (const test of spec.tests || []) {
+                  const results = test.results || [];
 
-                const hasPassed = results.some(r => r.status === 'passed');
-                const hasFailed = results.some(r => r.status === 'failed');
-                const hasSkipped = results.some(r => r.status === 'skipped');
+                  const hasPassed = results.some(r => r.status === 'passed');
+                  const hasFailed = results.some(r => r.status === 'failed');
+                  const hasSkipped = results.some(r => r.status === 'skipped');
 
-                if (hasSkipped) {
-                  skipped++;
-                } else if (hasPassed && hasFailed) {
-                  flaky++;
-                } else if (hasPassed) {
-                  passed++;
-                } else if (hasFailed) {
-                  failed++;
+                  if (hasSkipped) {
+                    skipped++;
+                  } else if (hasPassed && hasFailed) {
+                    flaky++;
+                  } else if (hasPassed) {
+                    passed++;
+                  } else if (hasFailed) {
+                    failed++;
+                  }
                 }
               }
             }
-          }
 
-          console.log('==============================');
-          console.log(' PLAYWRIGHT TEST SUMMARY');
-          console.log('==============================');
-          console.log('Passed :', passed);
-          console.log('Failed :', failed);
-          console.log('Skipped:', skipped);
-          console.log('Flaky  :', flaky);
-          console.log('==============================');
-          "
+            console.log('==============================');
+            console.log(' PLAYWRIGHT TEST SUMMARY');
+            console.log('==============================');
+            console.log('Passed :', passed);
+            console.log('Failed :', failed);
+            console.log('Skipped:', skipped);
+            console.log('Flaky  :', flaky);
+            console.log('==============================');
+            "
       - name: Upload Merged Report
         uses: actions/upload-artifact@v4
         with:

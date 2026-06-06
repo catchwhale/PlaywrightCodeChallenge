@@ -74,7 +74,7 @@ jobs:
       - name: Run UI Tests (Blob)
         continue-on-error: true
         run: |
-          npx playwright test tests/ui/smoke.spec.ts
+          npx playwright test tests/api/employee.spec.ts
 
       - name: Prepare UI JSON
         if: always()
