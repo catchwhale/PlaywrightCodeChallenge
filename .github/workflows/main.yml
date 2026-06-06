@@ -87,8 +87,7 @@ jobs:
             - ✅ Passed: ${passed}
             - ❌ Failed: ${failed}
             - ⏭ Skipped: ${skipped}
-            - ⚠️ Flaky: ${flaky}
-            `;
+            - ⚠️ Flaky: ${flaky}`;
 
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
           "
