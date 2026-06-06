@@ -26,6 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci
@@ -34,28 +35,48 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-blob
-          path: blobs
+          path: blobs/ui
 
       - name: Download API Blob
         uses: actions/download-artifact@v4
         with:
           name: api-blob
-          path: blobs
+          path: blobs/api
 
-      - name: Verify blobs
-        run: ls -R blobs
+      - name: Verify Downloaded Artifacts
+        run: |
+          echo "=== BLOBS ==="
+          ls -R blobs || true
 
       - name: Merge Playwright Reports
-        run: npx playwright merge-reports blobs --reporter html
+        run: |
+          npx playwright merge-reports blobs --reporter html
 
-      - name: Generate JSON Summary Report
-        run: npx playwright merge-reports blobs --reporter json > merged-report.json
+      - name: Verify Merged Report
+        run: |
+          ls -R playwright-report || true
 
-      - name: Write GitHub Summary
-        run: node scripts/playwright-summary.js
+          if [ ! -f playwright-report/index.html ]; then
+            echo "Merged report not found"
+            exit 1
+          fi
+
+      - name: Generate JSON Report
+        run: |
+          npx playwright merge-reports blobs --reporter json > merged-report.json
+
+      - name: Verify JSON Report
+        run: |
+          test -f merged-report.json
+          cat merged-report.json | head -20
 
       - name: Print Test Summary
-        run: node scripts/print-summary.js
+        run: |
+          node scripts/print-summary.js
+
+      - name: Write GitHub Summary
+        run: |
+          node scripts/playwright-summary.js
 
       - name: Upload Merged Report
         uses: actions/upload-artifact@v4
@@ -64,7 +85,8 @@ jobs:
           path: playwright-report
 
       - name: Generate HTML Dashboard
-        run: node scripts/generate-dashboard.js
+        run: |
+          node scripts/generate-dashboard.js
 
       - name: Upload Dashboard
         uses: actions/upload-artifact@v4
@@ -74,8 +96,7 @@ jobs:
             playwright-dashboard.html
             email.html
 
-      - name: Load HTML
-        shell: bash
+      - name: Load Email Body
         run: |
           {
             echo 'HTML_BODY<<EOF'
@@ -84,6 +105,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Send Email Report
+        continue-on-error: true
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -91,7 +113,7 @@ jobs:
           secure: true
           username: ${{ secrets.GMAIL_USERNAME }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: Playwright Test Report - Run
+          subject: Playwright Test Report - Run #${{ github.run_number }}
           to: mr_joe8888@yahoo.com
           from: CI Bot Automation <${{ secrets.GMAIL_USERNAME }}>
           html_body: ${{ env.HTML_BODY }}
