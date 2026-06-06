@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import { Employee } from '../models/Employee';
 import { EmployeeApi } from '../endpoints/EmployeeApi';
 
@@ -21,13 +22,9 @@ export class EmployeeService {
     const response =
     await this.employeeApi.getEmployeeById(employeeId);
 
-    if (!response.ok()) {
-        throw new Error(
-            `Failed to fetch employee. Status: ${response.status()}`
-            );
-        }
+    expect(response.ok()).toBeTruthy();
 
     const body = await response.json();
-    return body.data as Employee;
+    return body.data[0] as Employee;
     }
 }

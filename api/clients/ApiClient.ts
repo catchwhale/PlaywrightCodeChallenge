@@ -1,11 +1,12 @@
 import { APIRequestContext, request } from '@playwright/test';
+import { PATHS } from '../../config/paths';
 
 export class ApiClient {
   protected apiContext!: APIRequestContext;
 
   async initialize() {
     this.apiContext = await request.newContext({
-      storageState: 'storageState.json',
+      storageState: PATHS.storageState,
     });
   }
 

@@ -22,9 +22,24 @@ export class EmployeeApi extends ApiClient {
     );
   }
 
-  async getEmployeeById(employeeId: string) {
+  async getEmployeeById(
+    employeeId: string,
+    limit = 50,
+    offset = 0
+  ) {
     return await this.apiContext.get(
-      `${env.baseURL}/web/index.php/api/v2/pim/employees/${employeeId}`
-    );
-  }
+      `${env.baseURL}/web/index.php/api/v2/pim/employees`,
+      {
+        params: {
+          limit,
+          offset,
+          model: 'detailed',
+          employeeId: employeeId,
+          includeEmployees: 'onlyCurrent',
+          sortField: 'employee.firstName',
+          sortOrder: 'ASC'
+        }
+      }
+       );
+    }
 }

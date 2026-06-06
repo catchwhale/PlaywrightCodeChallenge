@@ -19,10 +19,6 @@ test.describe('PIM Module Tests', () => {
     dashboardPage = new DashboardPage(page);
     pimPage = new PIMPage(page);
 
-    // const employee = generateEmployeeName();
-    // firstName = employee.firstName;
-    // lastName = employee.lastName;
-
     await loginPage.gotoDashboard();
     await test.step('Navigate to PIM module', async () => {
         await dashboardPage.navigateToPIM();

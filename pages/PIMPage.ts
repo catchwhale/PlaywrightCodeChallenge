@@ -3,6 +3,9 @@ import { Page, expect } from '@playwright/test';
 export class PIMPage {
   constructor(private page: Page) {}
 
+  async navigateAddEmployee() {
+    await this.page.getByRole('link', { name: 'Add Employee' }).click();
+  }
   async clickAddEmployee() {
     await this.page.getByRole('button', { name: 'Add' }).click();
   }
@@ -10,7 +13,7 @@ export class PIMPage {
      await this.page.getByRole('button', { name: 'Save' }).click();
   }
   async addEmployee(firstName: string, lastName: string) {
-    await this.clickAddEmployee();
+    // await this.clickAddEmployee();
     await this.page.getByPlaceholder('First Name').fill(firstName);
     await this.page.getByPlaceholder('Last Name').fill(lastName);
 

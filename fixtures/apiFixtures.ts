@@ -8,8 +8,8 @@ type ApiFixtures = {
 };
 
 export const test = base.extend<ApiFixtures>({
-  employeeApi: async ({}, use) => {
-    const employeeApi = new EmployeeApi();
+  employeeApi: async ({request}, use) => {
+    const employeeApi = new EmployeeApi(request);
 
     await employeeApi.initialize();
 

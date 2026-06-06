@@ -23,6 +23,7 @@ export class DashboardPage {
   }
   
   async navigateToPIM() {
+    await this.page.waitForLoadState('domcontentloaded');
     await this.page.getByRole('link', { name: 'PIM' }).click();
   }
   

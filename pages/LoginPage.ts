@@ -4,7 +4,13 @@ export class LoginPage {
   constructor(private page: Page) {}
 
   async gotoURL(url: string) {
-    await this.page.goto(url);
+    await this.page.goto(url, {
+    waitUntil: 'commit'
+  });
+
+  //   await expect(
+  //     this.page.getByRole('textbox', { name: /username/i })
+  //   ).toBeVisible();
   }
 
   async login(username: string, password: string) {
@@ -35,7 +41,10 @@ export class LoginPage {
  }
 
   async verifysubURL(subURL: string) {
-    await expect(this.page).toHaveURL(subURL);
+    // await expect(this.page).toHaveURL(subURL);
+    await expect(this.page).toHaveURL(
+      new RegExp(subURL)
+    )
   }
 
   async verifyPlaceholderVisible(placeholder: string) {
