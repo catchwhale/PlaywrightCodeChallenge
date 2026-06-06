@@ -82,7 +82,7 @@ jobs:
           const fs = require('fs');
 
           const summary =
-            `## 🎭 Playwright Test Summary
+            `## Playwright Test Summary
 
             - ✅ Passed: ${passed}
             - ❌ Failed: ${failed}
