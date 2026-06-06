@@ -11,7 +11,7 @@ export default defineConfig({
         timeout: 15 * 1000,
     },
     fullyParallel: false, // enables parallel per file
-    workers: 1,
+    workers: 2,
     retries: 0,
     maxFailures: 0,        // IMPORTANT: do NOT stop after failures
     globalSetup: './global-setup.ts',
@@ -27,6 +27,7 @@ export default defineConfig({
         
     },
     reporter: [
+        ['list'],
         ['html', { outputFolder: 'playwright-report', open: 'never' }],
         ['blob'],
         ['json', { outputFile: 'test-results.json' }]
