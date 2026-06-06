@@ -7,260 +7,60 @@ on:
 
 jobs:
   ui:
-    needs: auth-setup
     uses: ./.github/workflows/ui-tests.yml
+
   api:
-    needs: auth-setup
     uses: ./.github/workflows/api-tests.yml
+
   merge-report:
     name: Merge Playwright Report
     runs-on: ubuntu-latest
-    needs:
-      - ui
-      - api
+    needs: [ui, api]
     if: always()
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install Dependencies
         run: npm ci
+
       - name: Download UI Blob
         uses: actions/download-artifact@v4
         with:
           name: ui-blob
-          path: blobs
+          path: blobs/ui
+
       - name: Download API Blob
         uses: actions/download-artifact@v4
         with:
           name: api-blob
-          path: blobs
+          path: blobs/api
+
       - name: Merge Playwright Reports
-        run: npx playwright merge-reports --reporter html blobs
+        run: npx playwright merge-reports blobs --reporter html
+
       - name: Upload Merged Report
         uses: actions/upload-artifact@v4
         with:
           name: merged-playwright-report
           path: playwright-report
-      - name: Merge UI + API Results
-        run: |
-          node << 'EOF'
-          const fs = require('fs');
 
-          const UI_FILE = 'results/ui-results.json';
-          const API_FILE = 'results/api-results.json';
-          const OUTPUT_DIR = 'results/combined';
-          const OUTPUT_FILE = `${OUTPUT_DIR}/combined-results.json`;
-
-          // Ensure directories
-          fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-
-          const readJson = (file) => {
-          try {
-            return fs.existsSync(file)
-              ? JSON.parse(fs.readFileSync(file, 'utf8'))
-              : null;
-          } catch (err) {
-            console.warn(`Failed to read ${file}:`, err.message);
-            return null;
-          }
-          };
-
-          const mergeSuites = (ui, api) => ({
-          summary: {
-            ui: ui?.stats ?? null,
-            api: api?.stats ?? null
-          },
-          suites: [
-            ...(ui?.suites ?? []),
-            ...(api?.suites ?? [])
-          ]
-          });
-
-          const ui = readJson(UI_FILE);
-          const api = readJson(API_FILE);
-
-          const merged = mergeSuites(ui, api);
-
-          fs.writeFileSync(OUTPUT_FILE, JSON.stringify(merged, null, 2));
-
-          console.log('Combined results created:', OUTPUT_FILE);
-          EOF
       - name: Generate HTML Dashboard
-        run: >
-          node << 'EOF'
+        run: node scripts/generate-dashboard.js
 
-          const fs = require('fs');
-
-          const FILES = [ 'results/ui-results.json', 'results/api-results.json'
-          ];
-
-          const loadJson = (file) => { try {
-            return fs.existsSync(file)
-              ? JSON.parse(fs.readFileSync(file, 'utf8'))
-              : null;
-          } catch {
-            return null;
-          }
-
-          };
-
-          const flattenTests = (suite, collector = []) => { for (const spec of
-          suite?.specs ?? []) {
-            for (const test of spec?.tests ?? []) {
-            collector.push(test);
-            }
-          }
-
-          for (const child of suite?.suites ?? []) {
-            flattenTests(child, collector);
-          }
-
-          return collector; };
-
-          const classifyTest = (test) => { const results = test?.results ?? [];
-
-          const hasPassed = results.some(r => r.status === 'passed'); const
-          hasFailed = results.some(r => r.status === 'failed'); const retries =
-          Math.max(0, results.length - 1);
-
-          const isFlaky = hasPassed && hasFailed;
-
-          return {
-            title: test?.title ?? 'Unknown Test',
-            retries,
-            status: isFlaky ? 'flaky' : hasPassed ? 'passed' : 'failed'
-          };
-
-          };
-
-          let total = 0; let passed = 0; let failed = 0; let flaky = 0;
-
-          const failedTests = []; const flakyTests = [];
-
-          const reports = FILES.map(loadJson).filter(Boolean);
-
-          for (const report of reports) { for (const suite of report?.suites ??
-          []) {
-            const tests = flattenTests(suite);
-
-            for (const t of tests) {
-            const result = classifyTest(t);
-            total++;
-
-            if (result.status === 'passed') passed++;
-            if (result.status === 'failed') {
-              failed++;
-              failedTests.push(result);
-            }
-            if (result.status === 'flaky') {
-              flaky++;
-              flakyTests.push(result);
-            }
-            }
-          } }
-
-          const runUrl =
-          `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-
-          const html = `
-
-          <!DOCTYPE html>
-
-          <html>
-
-          <head>
-
-          <title>Playwright Dashboard</title>
-
-          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-          <style>
-            body { font-family: Arial; background:#f6f8fa; padding:20px; }
-            .card { background:#fff; padding:20px; border-radius:10px; margin-bottom:20px; }
-            .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-          </style>
-
-          </head>
-
-          <body>
-
-          <div class="card">
-            <h2>Playwright Dashboard</h2>
-            <p><b>Run:</b> <a href="${runUrl}">${runUrl}</a></p>
-          </div>
-
-          <div class="grid">
-            <div class="card">
-            <h3>Overview</h3>
-            <canvas id="pieChart"></canvas>
-            </div>
-
-            <div class="card">
-            <h3>Summary</h3>
-            <p>Total: ${total}</p>
-            <p>Passed: ${passed}</p>
-            <p>Failed: ${failed}</p>
-            <p>Flaky: ${flaky}</p>
-            </div>
-          </div>
-
-          <div class="grid">
-
-            <div class="card">
-            <h3>Failed Tests</h3>
-            <ul>
-              ${failedTests.length
-              ? failedTests.map(t => `<li>${t.title} (Retries: ${t.retries})</li>`).join('')
-              : '<li>None</li>'}
-            </ul>
-            </div>
-
-            <div class="card">
-            <h3>Flaky Tests</h3>
-            <ul>
-              ${flakyTests.length
-              ? flakyTests.map(t => `<li>${t.title}</li>`).join('')
-              : '<li>None</li>'}
-            </ul>
-            </div>
-
-          </div>
-
-          <script>
-            new Chart(document.getElementById('pieChart'), {
-            type: 'pie',
-            data: {
-              labels: ['Passed', 'Failed', 'Flaky'],
-              datasets: [{
-              data: [${passed}, ${failed}, ${flaky}]
-              }]
-            }
-            });
-          </script>
-
-          </body>
-
-          </html>
-
-          `;
-
-          fs.writeFileSync('playwright-dashboard.html', html);
-
-          fs.writeFileSync('email.html', html);
-
-          console.log('Dashboard generated');
-
-          EOF
-      - name: Upload Combined Artifact
+      - name: Upload Dashboard
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-results
+          name: playwright-dashboard
           path: |
-            *.zip
+            playwright-dashboard.html
+            email.html
 
       - name: Load HTML
         shell: bash
@@ -281,7 +81,6 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: Playwright Test Report - Run
           to: mr_joe8888@yahoo.com
-          from: CI Bot Automation from <${{ secrets.GMAIL_USERNAME }}>
+          from: CI Bot Automation <${{ secrets.GMAIL_USERNAME }}>
           html_body: ${{ env.HTML_BODY }}
-          attachments: |
-            playwright-dashboard.html
+          attachments: playwright-dashboard.html
